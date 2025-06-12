@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Dimensions } from 'react-native';
+import { Dimensions, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function TimerScreen() {
   const [time, setTime] = useState(0);
@@ -80,7 +80,7 @@ export default function TimerScreen() {
     const { width, height } = screenDimensions;
     const isLandscape = width > height;
     const scaleFactor = Math.min(width, height) / 400;
-    
+
     return {
       content: {
         flexDirection: isLandscape ? 'row' : 'column',
@@ -101,31 +101,27 @@ export default function TimerScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={[styles.content, responsiveStyles.content]}>
-        <View style={isLandscape ? styles.leftColumn : null}>
-          <View style={[styles.modeSelector, responsiveStyles.modeSelector]}>
-            <TouchableOpacity
-              style={[styles.modeButton, mode === 'stopwatch' && styles.activeModeButton]}
-              onPress={switchMode}
-            >
-              <Text style={[styles.modeText, mode === 'stopwatch' && styles.activeModeText]}>
-                Stopwatch
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modeButton, mode === 'timer' && styles.activeModeButton]}
-              onPress={switchMode}
-            >
-              <Text style={[styles.modeText, mode === 'timer' && styles.activeModeText]}>
-                Timer
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <Text style={[styles.timeDisplay, responsiveStyles.timeDisplay]}>{formatTime(time)}</Text>
+      <View style={styles.content}>
+        <View style={styles.modeSelector}>
+          <TouchableOpacity
+            style={[styles.modeButton, mode === 'stopwatch' && styles.activeModeButton]}
+            onPress={switchMode}
+          >
+            <Text style={[styles.modeText, mode === 'stopwatch' && styles.activeModeText]}>
+              Stopwatch
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.modeButton, mode === 'timer' && styles.activeModeButton]}
+            onPress={switchMode}
+          >
+            <Text style={[styles.modeText, mode === 'timer' && styles.activeModeText]}>
+              Timer
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={isLandscape ? styles.rightColumn : null}>
+        <Text style={styles.timeDisplay}>{formatTime(time)}</Text>
 
         {mode === 'timer' && !isRunning && (
           <View style={styles.timerControls}>

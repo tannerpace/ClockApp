@@ -1,0 +1,128 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Expo Development Server",
+      "type": "shell",
+      "command": "npx expo start",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "runOptions": {
+        "runOn": "default"
+      }
+    },
+    {
+      "label": "Start Expo (Android)",
+      "type": "shell",
+      "command": "npx expo start --android",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Start Expo (iOS)",
+      "type": "shell",
+      "command": "npx expo start --ios",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Start Expo (Web)",
+      "type": "shell",
+      "command": "npx expo start --web",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Clear Expo Cache",
+      "type": "shell",
+      "command": "npx expo start --clear",
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Install Dependencies",
+      "type": "shell",
+      "command": "npm install",
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Expo Doctor",
+      "type": "shell",
+      "command": "npx expo doctor",
+      "group": "test",
+      "isBackground": false,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Build APK (Development)",
+      "type": "shell",
+      "command": "npx eas build --platform android --profile development",
+      "group": "build",
+      "isBackground": false,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "ms-vscode.vscode-react-native",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-json",
+    "expo.vscode-expo-tools",
+    "ms-vscode.vscode-typescript-next",
+    "gruntfuggly.todo-tree",
+    "wayou.vscode-todo-highlight",
+    "ms-vscode.sublime-keybindings"
+  ]
+}

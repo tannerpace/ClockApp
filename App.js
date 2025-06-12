@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import AnalogClockScreen from './screens/AnalogClockScreen';
 import DigitalClockScreen from './screens/DigitalClockScreen';
 import TimerScreen from './screens/TimerScreen';
+import WeatherScreen from './screens/WeatherScreen';
 import WorldClockScreen from './screens/WorldClockScreen';
 
 const Tab = createBottomTabNavigator();
@@ -26,6 +27,8 @@ export default function App() {
               iconName = focused ? 'globe' : 'globe-outline';
             } else if (route.name === 'Timer') {
               iconName = focused ? 'timer' : 'timer-outline';
+            } else if (route.name === 'Weather') {
+              iconName = focused ? 'cloud' : 'cloud-outline';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -64,6 +67,11 @@ export default function App() {
           name="Timer"
           component={TimerScreen}
           options={{ title: 'Timer & Stopwatch' }}
+        />
+        <Tab.Screen
+          name="Weather"
+          component={WeatherScreen}
+          options={{ title: 'Weather' }}
         />
       </Tab.Navigator>
       <StatusBar style="light" />

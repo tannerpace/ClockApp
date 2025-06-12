@@ -1,15 +1,23 @@
 import { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 export default function WorldClockScreen() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timer);
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setScreenDimensions(window);
+    });
+
+    return () => {
+      clearInterval(timer);
+      subscription?.remove();
+    };
   }, []);
 
   const timeZones = [
@@ -40,12 +48,30 @@ export default function WorldClockScreen() {
     });
   };
 
+  const getResponsiveStyles = () => {
+    const { width, height } = screenDimensions;
+    const isLandscape = width > height;
+
+    return {
+      content: {
+        flexDirection: isLandscape ? 'row' : 'column',
+        flexWrap: isLandscape ? 'wrap' : 'nowrap',
+      },
+      timeZoneItem: {
+        width: isLandscape ? '48%' : '100%',
+        marginBottom: isLandscape ? 10 : 0,
+      }
+    };
+  };
+
+  const responsiveStyles = getResponsiveStyles();
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      <View style={[styles.content, responsiveStyles.content]}>
         <Text style={styles.title}>World Clock</Text>
         {timeZones.map((zone, index) => (
-          <View key={index} style={styles.timeZoneItem}>
+          <View key={index} style={[styles.timeZoneItem, responsiveStyles.timeZoneItem]}>
             <View style={styles.cityInfo}>
               <Text style={styles.cityName}>{zone.name}</Text>
               <Text style={styles.cityDate}>{getDateForTimezone(zone.timezone)}</Text>
@@ -66,6 +92,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+    justifyContent: 'flex-start',
   },
   title: {
     fontSize: 24,

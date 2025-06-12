@@ -1,0 +1,27 @@
+[
+  {
+    "key": "cmd+shift+r",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Start Expo Development Server"
+  },
+  {
+    "key": "cmd+shift+a",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Start Expo (Android)"
+  },
+  {
+    "key": "cmd+shift+i",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Start Expo (iOS)"
+  },
+  {
+    "key": "cmd+shift+w",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Start Expo (Web)"
+  },
+  {
+    "key": "cmd+shift+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Clear Expo Cache"
+  }
+]

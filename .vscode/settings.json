@@ -1,0 +1,50 @@
+{
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "*.jsx": "javascriptreact"
+  },
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "javascript.preferences.includePackageJsonAutoImports": "auto",
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.expo": true,
+    "**/dist": true,
+    "**/build": true
+  },
+  "files.exclude": {
+    "**/.expo": true,
+    "**/node_modules": true
+  },
+  "files.watcherExclude": {
+    "**/.expo/**": true,
+    "**/node_modules/**": true
+  },
+  "javascript.validate.enable": false,
+  "typescript.validate.enable": false,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "terminal.integrated.env.osx": {
+    "EXPO_NO_DOTENV": "1"
+  },
+  "terminal.integrated.env.linux": {
+    "EXPO_NO_DOTENV": "1"
+  },
+  "terminal.integrated.env.windows": {
+    "EXPO_NO_DOTENV": "1"
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.js": "${capture}.map, ${capture}.min.js",
+    "*.jsx": "${capture}.js",
+    "*.ts": "${capture}.js, ${capture}.d.ts.map, ${capture}.d.ts, ${capture}.js.map",
+    "*.tsx": "${capture}.ts",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml"
+  }
+}

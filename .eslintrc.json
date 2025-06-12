@@ -1,0 +1,12 @@
+{
+  "extends": ["expo", "@expo/eslint-config/metro"],
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "react/prop-types": "off",
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "env": {
+    "react-native/react-native": true
+  }
+}
