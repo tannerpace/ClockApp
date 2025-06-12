@@ -4,13 +4,21 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 // Fallback for when SVG is not available
 export default function AnalogClock() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timer);
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setScreenDimensions(window);
+    });
+
+    return () => {
+      clearInterval(timer);
+      subscription?.remove();
+    };
   }, []);
 
   try {
@@ -18,8 +26,8 @@ export default function AnalogClock() {
     const Svg = require('react-native-svg').default;
     const { Circle, Line, Text: SvgText } = require('react-native-svg');
 
-    const { width } = Dimensions.get('window');
-    const clockSize = Math.min(width * 0.8, 300);
+    const { width, height } = screenDimensions;
+    const clockSize = Math.min(width * 0.7, height * 0.6, 300);
     const centerX = clockSize / 2;
     const centerY = clockSize / 2;
     const radius = clockSize / 2 - 20;
