@@ -69,7 +69,7 @@ export default function TimerScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.modeSelector}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.modeButton, mode === 'stopwatch' && styles.activeModeButton]}
             onPress={switchMode}
           >
@@ -77,7 +77,7 @@ export default function TimerScreen() {
               Stopwatch
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.modeButton, mode === 'timer' && styles.activeModeButton]}
             onPress={switchMode}
           >
@@ -107,8 +107,8 @@ export default function TimerScreen() {
           <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
             <Text style={styles.buttonText}>Reset</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.startButton, isRunning && styles.stopButton]} 
+          <TouchableOpacity
+            style={[styles.startButton, isRunning && styles.stopButton]}
             onPress={handleStartStop}
           >
             <Text style={styles.buttonText}>

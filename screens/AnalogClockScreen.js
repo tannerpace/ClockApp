@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import AnalogClock from '../components/AnalogClock';
 
 export default function AnalogClockScreen() {

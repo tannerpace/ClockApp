@@ -5,8 +5,8 @@ import { StatusBar } from 'expo-status-bar';
 
 import AnalogClockScreen from './screens/AnalogClockScreen';
 import DigitalClockScreen from './screens/DigitalClockScreen';
-import WorldClockScreen from './screens/WorldClockScreen';
 import TimerScreen from './screens/TimerScreen';
+import WorldClockScreen from './screens/WorldClockScreen';
 
 const Tab = createBottomTabNavigator();
 
