@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "auto",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -21,13 +21,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "targetSdkVersion": 34,
-      "compileSdkVersion": 34,
-      "permissions": [
-        "android.permission.WAKE_LOCK",
-        "android.permission.INTERNET",
-        "android.permission.ACCESS_NETWORK_STATE"
-      ]
+      "permissions": ["android.permission.ACCESS_NETWORK_STATE"],
+      "package": "com.anonymous.clockapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
