@@ -75,30 +75,47 @@ export default function DigitalClock() {
   const getResponsiveStyles = () => {
     const { width, height } = screenDimensions;
     const isLandscape = width > height;
-    const scaleFactor = Math.min(width, height) / 400;
+
+    // Calculate available width (with padding)
+    const availableWidth = width - 40; // Account for padding
 
     // Font size multipliers based on settings
     const fontSizeMultiplier =
       {
-        small: 0.8,
-        medium: 1.0,
-        large: 1.2,
-        xlarge: 1.5,
-      }[settings.fontSize] || 1.0;
+        small: 0.7,
+        medium: 0.9,
+        large: 1.1,
+        xlarge: 1.3,
+      }[settings.fontSize] || 0.9;
+
+    // Base font sizes that fit within screen width
+    let baseFontSize;
+    if (isLandscape) {
+      // Landscape mode - more conservative sizing
+      baseFontSize = Math.min(48, availableWidth / 8);
+    } else {
+      // Portrait mode - calculate based on available width
+      // Assume ~8-9 characters for "12:34 PM" or "12:34:56 PM"
+      const charCount = settings.showSeconds ? 11 : 8;
+      baseFontSize = Math.min(60, (availableWidth / charCount) * 1.2);
+    }
 
     return {
       time: {
-        fontSize: Math.max(32, Math.min(72, 72 * scaleFactor * fontSizeMultiplier)),
+        fontSize: Math.max(24, baseFontSize * fontSizeMultiplier),
         marginBottom: isLandscape ? 10 : 20,
         color: settings.textColor,
+        // Ensure text doesn't wrap
+        flexShrink: 1,
+        textAlign: 'center',
       },
       greeting: {
-        fontSize: Math.max(16, Math.min(20, 20 * scaleFactor * fontSizeMultiplier)),
+        fontSize: Math.max(14, Math.min(20, baseFontSize * 0.3 * fontSizeMultiplier)),
         marginBottom: isLandscape ? 10 : 20,
         color: settings.textColor,
       },
       date: {
-        fontSize: Math.max(14, Math.min(18, 18 * scaleFactor * fontSizeMultiplier)),
+        fontSize: Math.max(12, Math.min(16, baseFontSize * 0.25 * fontSizeMultiplier)),
         color: settings.textColor,
       },
     };
@@ -117,7 +134,12 @@ export default function DigitalClock() {
     return (
       <View style={[styles.landscapeContainer, dynamicContainerStyle]}>
         <View style={styles.landscapeTimeSection}>
-          <Text style={[styles.landscapeTime, responsiveStyles.time]}>
+          <Text
+            style={[styles.landscapeTime, responsiveStyles.time]}
+            numberOfLines={1}
+            adjustsFontSizeToFit={true}
+            minimumFontScale={0.6}
+          >
             {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
           </Text>
           <Text style={[styles.landscapeDate, responsiveStyles.date]}>
@@ -139,7 +161,12 @@ export default function DigitalClock() {
       <Text style={[styles.greeting, responsiveStyles.greeting]}>
         Good {getTimeOfDay(currentTime)}
       </Text>
-      <Text style={[styles.time, responsiveStyles.time]}>
+      <Text
+        style={[styles.time, responsiveStyles.time]}
+        numberOfLines={1}
+        adjustsFontSizeToFit={true}
+        minimumFontScale={0.5}
+      >
         {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
       </Text>
       <Text style={[styles.date, responsiveStyles.date]}>{formatDate(currentTime)}</Text>
@@ -152,6 +179,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
+    paddingHorizontal: 20,
   },
   landscapeContainer: {
     flexDirection: 'row',
