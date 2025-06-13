@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import { SafeAreaView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import WeatherComponent from '../components/WeatherComponent';
 import { useSettings } from '../contexts/SettingsContext';
 import { useTabBar } from '../contexts/TabBarContext';
@@ -11,11 +11,14 @@ export default function WeatherScreen() {
     showTabBarAndResetTimer();
   };
 
+  // Use View instead of SafeAreaView when titles are hidden for better centering
+  const Container = settings.showScreenTitles ? SafeAreaView : View;
+
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
-      <SafeAreaView style={[styles.container, { backgroundColor: settings.backgroundColor }]}>
+      <Container style={[styles.container, { backgroundColor: settings.backgroundColor }]}>
         <WeatherComponent />
-      </SafeAreaView>
+      </Container>
     </TouchableWithoutFeedback>
   );
 }
@@ -23,6 +26,5 @@ export default function WeatherScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
   },
 });

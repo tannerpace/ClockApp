@@ -147,10 +147,6 @@ const SettingsScreen = () => {
             updateSetting('textColor', color)
           )}
 
-          {renderOptionPicker('Theme', themes, settings.theme, theme =>
-            updateSetting('theme', theme)
-          )}
-
           {renderOptionPicker('Font Size', fontSizes, settings.fontSize, size =>
             updateSetting('fontSize', size)
           )}
