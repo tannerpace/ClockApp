@@ -67,6 +67,8 @@ const WorldClockComponent = () => {
         medium: 1.0,
         large: 1.2,
         xlarge: 1.5,
+        xxlarge: 1.8,
+        ginormous: 2.2,
       }[settings.fontSize] || 1.0;
 
     return {

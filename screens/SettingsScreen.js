@@ -156,6 +156,8 @@ const SettingsScreen = () => {
             { name: 'Medium', value: 'medium' },
             { name: 'Large', value: 'large' },
             { name: 'Extra Large', value: 'xlarge' },
+            { name: 'Extra Extra Large', value: 'xxlarge' },
+            { name: 'Ginormous', value: 'ginormous' },
           ],
           size => updateSetting('fontSize', size)
         )}

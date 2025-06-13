@@ -92,6 +92,8 @@ export default function DigitalClock() {
         medium: 1.0,
         large: 1.4,
         xlarge: 1.5,
+        xxlarge: 1.8,
+        ginormous: 2.2,
       }[settings.fontSize] || 0.9;
 
     // Base font sizes that fit within screen width

@@ -56,11 +56,18 @@ export const BurnInProvider = ({ children }) => {
     }, settings.burnInShiftInterval * 1000);
 
     return () => clearInterval(shiftInterval);
-  }, [settings.burnInPrevention, settings.burnInPositionShift, settings.burnInShiftInterval, maxOffsetX, maxOffsetY]);
+  }, [
+    settings.burnInPrevention,
+    settings.burnInPositionShift,
+    settings.burnInShiftInterval,
+    maxOffsetX,
+    maxOffsetY,
+  ]);
 
   // Dimming effect based on inactivity
   useEffect(() => {
-    if (!settings.burnInPrevention || !settings.burnInAutoDim || settings.burnInDimAfter === 0) return;
+    if (!settings.burnInPrevention || !settings.burnInAutoDim || settings.burnInDimAfter === 0)
+      return;
 
     const dimInterval = setInterval(() => {
       const now = Date.now();
@@ -114,7 +121,7 @@ export const BurnInProvider = ({ children }) => {
         { translateY: settings.burnInPositionShift ? burnInOffset.y : 0 },
         { scale: sizeVariation },
       ],
-      opacity: (settings.burnInAutoDim && isDimmed) ? 0.6 : 1,
+      opacity: settings.burnInAutoDim && isDimmed ? 0.6 : 1,
       color: settings.burnInColorRotation ? colorRotationPalette[colorIndex] : settings.textColor,
     };
   };

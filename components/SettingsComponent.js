@@ -63,6 +63,8 @@ const SettingsComponent = ({ visible, onClose, onSettingsChange }) => {
     { name: 'Medium', value: 'medium' },
     { name: 'Large', value: 'large' },
     { name: 'Extra Large', value: 'xlarge' },
+    { name: 'Extra Extra Large', value: 'xxlarge' },
+    { name: 'Ginormous', value: 'ginormous' },
   ];
 
   // Load settings from storage
