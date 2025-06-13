@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 
+import { FullscreenProvider } from './contexts/FullscreenContext';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 import { TabBarProvider, useTabBar } from './contexts/TabBarContext';
 import { WeatherProvider } from './contexts/WeatherContext';
@@ -88,7 +89,7 @@ function AppNavigator() {
           options={{ title: settings.showScreenTitles ? 'Settings' : '' }}
         />
       </Tab.Navigator>
-      <StatusBar style="light" />
+      <StatusBar style="light" hidden={true} />
     </NavigationContainer>
   );
 }
@@ -98,7 +99,9 @@ export default function App() {
     <SettingsProvider>
       <WeatherProvider>
         <TabBarProvider>
-          <AppNavigator />
+          <FullscreenProvider>
+            <AppNavigator />
+          </FullscreenProvider>
         </TabBarProvider>
       </WeatherProvider>
     </SettingsProvider>

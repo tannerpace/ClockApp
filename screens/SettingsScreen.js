@@ -18,6 +18,7 @@ const isLandscape = width > height;
 const SettingsScreen = () => {
   const { settings, updateSettings } = useSettings();
   const { showTabBarAndResetTimer } = useTabBar();
+  const { isFullscreen, toggleFullscreen } = useFullscreen();
 
   const handleTouch = () => {
     showTabBarAndResetTimer();
@@ -158,6 +159,16 @@ const SettingsScreen = () => {
           {renderSwitch('Auto-hide Tab Bar', settings.autoHideTabBar, value =>
             updateSetting('autoHideTabBar', value)
           )}
+
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Immersive Fullscreen</Text>
+            <Switch
+              value={isFullscreen}
+              onValueChange={toggleFullscreen}
+              trackColor={{ false: '#767577', true: '#81b0ff' }}
+              thumbColor={isFullscreen ? '#f5dd4b' : '#f4f3f4'}
+            />
+          </View>
         </View>
 
         {/* Clock Settings */}
