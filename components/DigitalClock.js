@@ -205,6 +205,7 @@ export default function DigitalClock() {
         fontSize: Math.max(14, Math.min(20, baseFontSize * 0.3 * fontSizeMultiplier)),
         marginBottom: isLandscape ? 10 : 20,
         color: settings.textColor,
+        textAlign: isLandscape ? 'right' : 'center',
       },
       date: {
         fontSize: Math.max(12, Math.min(16, baseFontSize * 0.25 * fontSizeMultiplier)),
@@ -213,19 +214,21 @@ export default function DigitalClock() {
       weather: {
         fontSize: Math.max(14, Math.min(18, baseFontSize * 0.3 * fontSizeMultiplier)),
         color: settings.textColor,
-        textAlign: 'center',
+        textAlign: isLandscape ? 'right' : 'center',
         opacity: 0.9,
         marginTop: isLandscape ? 5 : 15,
       },
       weatherCondition: {
-        fontSize: Math.max(9, Math.min(12, baseFontSize * 0.18 * fontSizeMultiplier)),
+        fontSize: Math.max(12, Math.min(16, baseFontSize * 0.25 * fontSizeMultiplier)),
         color: settings.textColor,
-        opacity: 0.7,
+        opacity: 0.8,
+        textAlign: isLandscape ? 'right' : 'center',
       },
       weatherLocation: {
-        fontSize: Math.max(8, Math.min(10, baseFontSize * 0.15 * fontSizeMultiplier)),
+        fontSize: Math.max(11, Math.min(14, baseFontSize * 0.22 * fontSizeMultiplier)),
         color: settings.textColor,
-        opacity: 0.6,
+        opacity: 0.7,
+        textAlign: isLandscape ? 'right' : 'center',
       },
     };
   };
@@ -391,9 +394,11 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   landscapeGreeting: {
-    color: '#888',
+    color: '#BBB',
     fontWeight: '300',
-    fontSize: 16,
+    fontSize: 18,
+    marginBottom: 12,
+    textAlign: 'right',
   },
   time: {
     color: '#fff',
@@ -428,24 +433,28 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   landscapeWeather: {
-    color: '#888',
-    fontWeight: '300',
-    fontSize: 16,
-    textAlign: 'left',
+    color: '#BBB',
+    fontWeight: '400',
+    fontSize: 20,
+    textAlign: 'right',
+    marginTop: 8,
+    marginBottom: 2,
   },
   landscapeWeatherCondition: {
-    color: '#888',
+    color: '#999',
     fontWeight: '300',
-    fontSize: 12,
-    textAlign: 'left',
+    fontSize: 16,
+    textAlign: 'right',
     marginTop: 2,
+    marginBottom: 1,
+    lineHeight: 20,
   },
   landscapeWeatherLocation: {
-    color: '#888',
+    color: '#777',
     fontWeight: '300',
-    fontSize: 10,
-    textAlign: 'left',
-    marginTop: 2,
+    fontSize: 14,
+    textAlign: 'right',
+    marginTop: 1,
   },
   weatherContainer: {
     marginTop: 15,
@@ -453,8 +462,9 @@ const styles = StyleSheet.create({
     // Remove height constraints that might hide content
   },
   landscapeWeatherContainer: {
-    marginTop: 10,
-    width: '100%',
-    // Remove height constraints and flex that might hide content
+    marginTop: 15,
+    alignItems: 'flex-end',
+    justifyContent: 'flex-start',
+    paddingRight: 5,
   },
 });
