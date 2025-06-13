@@ -1,6 +1,14 @@
-import * as NavigationBar from 'expo-navigation-bar';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+
+// Safely import expo-navigation-bar with fallback
+let NavigationBar;
+try {
+  NavigationBar = require('expo-navigation-bar');
+} catch (error) {
+  console.warn('expo-navigation-bar not available:', error);
+  NavigationBar = null;
+}
 
 const FullscreenContext = createContext();
 
@@ -17,7 +25,7 @@ export const FullscreenProvider = ({ children }) => {
   const [navigationBarVisible, setNavigationBarVisible] = useState(false);
 
   const enableFullscreen = async () => {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === 'android' && NavigationBar) {
       try {
         await NavigationBar.setVisibilityAsync('hidden');
         await NavigationBar.setBehaviorAsync('overlay-swipe');
@@ -26,12 +34,19 @@ export const FullscreenProvider = ({ children }) => {
         setIsFullscreen(true);
       } catch (error) {
         console.log('Error enabling fullscreen:', error);
+        // Fallback - just set the state
+        setIsFullscreen(true);
+        setNavigationBarVisible(false);
       }
+    } else {
+      // Fallback for non-Android or when NavigationBar is not available
+      setIsFullscreen(true);
+      setNavigationBarVisible(false);
     }
   };
 
   const showNavigationBar = async () => {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === 'android' && NavigationBar) {
       try {
         await NavigationBar.setVisibilityAsync('visible');
         await NavigationBar.setBehaviorAsync('inset-swipe');
@@ -39,7 +54,14 @@ export const FullscreenProvider = ({ children }) => {
         setIsFullscreen(false);
       } catch (error) {
         console.log('Error showing navigation bar:', error);
+        // Fallback - just set the state
+        setIsFullscreen(false);
+        setNavigationBarVisible(true);
       }
+    } else {
+      // Fallback for non-Android or when NavigationBar is not available
+      setIsFullscreen(false);
+      setNavigationBarVisible(true);
     }
   };
 
