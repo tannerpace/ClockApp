@@ -1,4 +1,3 @@
-import { activateKeepAwakeAsync, deactivateKeepAwakeAsync } from 'expo-keep-awake';
 import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { useSettings } from '../contexts/SettingsContext';
@@ -9,10 +8,6 @@ export default function DigitalClock() {
   const { settings } = useSettings();
 
   useEffect(() => {
-    if (settings.keepAwake) {
-      activateKeepAwakeAsync(); // Keep screen awake while clock is active
-    }
-
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -23,9 +18,6 @@ export default function DigitalClock() {
 
     return () => {
       clearInterval(timer);
-      if (settings.keepAwake) {
-        deactivateKeepAwakeAsync();
-      }
       subscription?.remove();
     };
   }, [settings.keepAwake]);

@@ -1,3 +1,5 @@
+import * as KeepAwake from 'expo-keep-awake';
+import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSettings } from '../contexts/SettingsContext';
 import AnalogClock from './AnalogClock';
@@ -6,6 +8,19 @@ import WorldClockComponent from './WorldClockComponent';
 
 const ClockComponent = () => {
   const { settings } = useSettings();
+
+  // Handle keep awake for all clock types
+  useEffect(() => {
+    if (settings.keepAwake) {
+      KeepAwake.activateKeepAwakeAsync();
+    }
+
+    return () => {
+      if (settings.keepAwake) {
+        KeepAwake.deactivateKeepAwake();
+      }
+    };
+  }, [settings.keepAwake]);
 
   const renderClock = () => {
     switch (settings.clockType) {

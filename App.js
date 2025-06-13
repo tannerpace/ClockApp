@@ -13,6 +13,9 @@ const Tab = createBottomTabNavigator();
 
 function AppNavigator() {
   const { settings } = useSettings();
+  if (settings === undefined) {
+    return null; // or a loading spinner
+  }
 
   return (
     <NavigationContainer>
@@ -54,9 +57,7 @@ function AppNavigator() {
           name="Clock"
           component={ClockScreen}
           options={{
-            title: settings.showScreenTitles
-              ? `${settings.clockType.charAt(0).toUpperCase() + settings.clockType.slice(1)} Clock`
-              : '',
+            title: settings.showScreenTitles ? 'Clock' : '',
           }}
         />
         <Tab.Screen
