@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import {
+  Dimensions,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { useSettings } from '../contexts/SettingsContext';
 import { useTabBar } from '../contexts/TabBarContext';
 
@@ -110,69 +118,71 @@ export default function TimerScreen() {
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
       <SafeAreaView style={[styles.container, { backgroundColor: settings.backgroundColor }]}>
-      <View style={[styles.content, { backgroundColor: settings.backgroundColor }]}>
-        <View style={styles.modeSelector}>
-          <TouchableOpacity
-            style={[styles.modeButton, mode === 'stopwatch' && styles.activeModeButton]}
-            onPress={switchMode}
-          >
-            <Text
-              style={[
-                styles.modeText,
-                mode === 'stopwatch' && styles.activeModeText,
-                { color: settings.textColor },
-              ]}
+        <View style={[styles.content, { backgroundColor: settings.backgroundColor }]}>
+          <View style={styles.modeSelector}>
+            <TouchableOpacity
+              style={[styles.modeButton, mode === 'stopwatch' && styles.activeModeButton]}
+              onPress={switchMode}
             >
-              Stopwatch
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.modeButton, mode === 'timer' && styles.activeModeButton]}
-            onPress={switchMode}
-          >
-            <Text
-              style={[
-                styles.modeText,
-                mode === 'timer' && styles.activeModeText,
-                { color: settings.textColor },
-              ]}
+              <Text
+                style={[
+                  styles.modeText,
+                  mode === 'stopwatch' && styles.activeModeText,
+                  { color: settings.textColor },
+                ]}
+              >
+                Stopwatch
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modeButton, mode === 'timer' && styles.activeModeButton]}
+              onPress={switchMode}
             >
-              Timer
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={[styles.timeDisplay, { color: settings.textColor }]}>{formatTime(time)}</Text>
-
-        {mode === 'timer' && !isRunning && (
-          <View style={styles.timerControls}>
-            <TouchableOpacity style={styles.adjustButton} onPress={() => adjustTimer(-60)}>
-              <Text style={[styles.adjustButtonText, { color: settings.textColor }]}>-1m</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.adjustButton} onPress={() => adjustTimer(60)}>
-              <Text style={[styles.adjustButtonText, { color: settings.textColor }]}>+1m</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.adjustButton} onPress={() => adjustTimer(300)}>
-              <Text style={[styles.adjustButtonText, { color: settings.textColor }]}>+5m</Text>
+              <Text
+                style={[
+                  styles.modeText,
+                  mode === 'timer' && styles.activeModeText,
+                  { color: settings.textColor },
+                ]}
+              >
+                Timer
+              </Text>
             </TouchableOpacity>
           </View>
-        )}
 
-        <View style={styles.controls}>
-          <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-            <Text style={[styles.buttonText, { color: settings.textColor }]}>Reset</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.startButton, isRunning && styles.stopButton]}
-            onPress={handleStartStop}
-          >
-            <Text style={[styles.buttonText, { color: settings.textColor }]}>
-              {isRunning ? 'Stop' : 'Start'}
-            </Text>
-          </TouchableOpacity>
+          <Text style={[styles.timeDisplay, { color: settings.textColor }]}>
+            {formatTime(time)}
+          </Text>
+
+          {mode === 'timer' && !isRunning && (
+            <View style={styles.timerControls}>
+              <TouchableOpacity style={styles.adjustButton} onPress={() => adjustTimer(-60)}>
+                <Text style={[styles.adjustButtonText, { color: settings.textColor }]}>-1m</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.adjustButton} onPress={() => adjustTimer(60)}>
+                <Text style={[styles.adjustButtonText, { color: settings.textColor }]}>+1m</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.adjustButton} onPress={() => adjustTimer(300)}>
+                <Text style={[styles.adjustButtonText, { color: settings.textColor }]}>+5m</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <View style={styles.controls}>
+            <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+              <Text style={[styles.buttonText, { color: settings.textColor }]}>Reset</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.startButton, isRunning && styles.stopButton]}
+              onPress={handleStartStop}
+            >
+              <Text style={[styles.buttonText, { color: settings.textColor }]}>
+                {isRunning ? 'Stop' : 'Start'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 }

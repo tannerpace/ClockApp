@@ -126,110 +126,111 @@ const SettingsScreen = () => {
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
       <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
+        <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Appearance Section */}
-        <View style={styles.category}>
-          <Text style={styles.categoryTitle}>🎨 Appearance</Text>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Appearance Section */}
+          <View style={styles.category}>
+            <Text style={styles.categoryTitle}>🎨 Appearance</Text>
 
-          {renderColorPicker(
-            'Background Color',
-            backgroundColors,
-            settings.backgroundColor,
-            color => updateSetting('backgroundColor', color)
-          )}
+            {renderColorPicker(
+              'Background Color',
+              backgroundColors,
+              settings.backgroundColor,
+              color => updateSetting('backgroundColor', color)
+            )}
 
-          {renderColorPicker('Text Color', textColors, settings.textColor, color =>
-            updateSetting('textColor', color)
-          )}
+            {renderColorPicker('Text Color', textColors, settings.textColor, color =>
+              updateSetting('textColor', color)
+            )}
 
-          {renderOptionPicker('Theme', themes, settings.theme, theme =>
-            updateSetting('theme', theme)
-          )}
+            {renderOptionPicker('Theme', themes, settings.theme, theme =>
+              updateSetting('theme', theme)
+            )}
 
-          {renderOptionPicker('Font Size', fontSizes, settings.fontSize, size =>
-            updateSetting('fontSize', size)
-          )}
+            {renderOptionPicker('Font Size', fontSizes, settings.fontSize, size =>
+              updateSetting('fontSize', size)
+            )}
 
-          {renderSwitch('Show Screen Titles', settings.showScreenTitles, value =>
-            updateSetting('showScreenTitles', value)
-          )}
+            {renderSwitch('Show Screen Titles', settings.showScreenTitles, value =>
+              updateSetting('showScreenTitles', value)
+            )}
 
-          {renderSwitch('Auto-hide Tab Bar', settings.autoHideTabBar, value =>
-            updateSetting('autoHideTabBar', value)
-          )}
-        </View>
+            {renderSwitch('Auto-hide Tab Bar', settings.autoHideTabBar, value =>
+              updateSetting('autoHideTabBar', value)
+            )}
+          </View>
 
-        {/* Clock Settings */}
-        <View style={styles.category}>
-          <Text style={styles.categoryTitle}>🕐 Clock Settings</Text>
+          {/* Clock Settings */}
+          <View style={styles.category}>
+            <Text style={styles.categoryTitle}>🕐 Clock Settings</Text>
 
-          {renderOptionPicker(
-            'Clock Type',
-            [
-              { name: 'Digital', value: 'digital' },
-              { name: 'Analog', value: 'analog' },
-              { name: 'World Clock', value: 'world' },
-            ],
-            settings.clockType,
-            type => updateSetting('clockType', type)
-          )}
+            {renderOptionPicker(
+              'Clock Type',
+              [
+                { name: 'Digital', value: 'digital' },
+                { name: 'Analog', value: 'analog' },
+                { name: 'World Clock', value: 'world' },
+              ],
+              settings.clockType,
+              type => updateSetting('clockType', type)
+            )}
 
-          {renderSwitch('Show Seconds', settings.showSeconds, value =>
-            updateSetting('showSeconds', value)
-          )}
+            {renderSwitch('Show Seconds', settings.showSeconds, value =>
+              updateSetting('showSeconds', value)
+            )}
 
-          {renderSwitch('24 Hour Format', settings.format24Hour, value =>
-            updateSetting('format24Hour', value)
-          )}
+            {renderSwitch('24 Hour Format', settings.format24Hour, value =>
+              updateSetting('format24Hour', value)
+            )}
 
-          {renderSwitch('Keep Screen Awake', settings.keepAwake, value =>
-            updateSetting('keepAwake', value)
-          )}
-        </View>
+            {renderSwitch('Keep Screen Awake', settings.keepAwake, value =>
+              updateSetting('keepAwake', value)
+            )}
+          </View>
 
-        {/* Weather Settings */}
-        <View style={styles.category}>
-          <Text style={styles.categoryTitle}>🌤️ Weather Settings</Text>
+          {/* Weather Settings */}
+          <View style={styles.category}>
+            <Text style={styles.categoryTitle}>🌤️ Weather Settings</Text>
 
-          {renderSwitch('Show Weather', settings.showWeather, value =>
-            updateSetting('showWeather', value)
-          )}
+            {renderSwitch('Show Weather', settings.showWeather, value =>
+              updateSetting('showWeather', value)
+            )}
 
-          {renderOptionPicker(
-            'Temperature Unit',
-            [
-              { name: 'Fahrenheit', value: 'fahrenheit' },
-              { name: 'Celsius', value: 'celsius' },
-            ],
-            settings.weatherUnit,
-            unit => updateSetting('weatherUnit', unit)
-          )}
-        </View>
+            {renderOptionPicker(
+              'Temperature Unit',
+              [
+                { name: 'Fahrenheit', value: 'fahrenheit' },
+                { name: 'Celsius', value: 'celsius' },
+              ],
+              settings.weatherUnit,
+              unit => updateSetting('weatherUnit', unit)
+            )}
+          </View>
 
-        {/* Display Settings */}
-        <View style={styles.category}>
-          <Text style={styles.categoryTitle}>📱 Display Settings</Text>
+          {/* Display Settings */}
+          <View style={styles.category}>
+            <Text style={styles.categoryTitle}>📱 Display Settings</Text>
 
-          {renderOptionPicker(
-            'Brightness',
-            [
-              { name: 'Auto', value: 'auto' },
-              { name: 'Low', value: 'low' },
-              { name: 'Medium', value: 'medium' },
-              { name: 'High', value: 'high' },
-            ],
-            settings.brightness,
-            brightness => updateSetting('brightness', brightness)
-          )}
-        </View>
-      </ScrollView>
-    </View>
+            {renderOptionPicker(
+              'Brightness',
+              [
+                { name: 'Auto', value: 'auto' },
+                { name: 'Low', value: 'low' },
+                { name: 'Medium', value: 'medium' },
+                { name: 'High', value: 'high' },
+              ],
+              settings.brightness,
+              brightness => updateSetting('brightness', brightness)
+            )}
+          </View>
+        </ScrollView>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
