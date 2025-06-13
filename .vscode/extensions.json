@@ -10,7 +10,6 @@
     "expo.vscode-expo-tools",
     "ms-vscode.vscode-typescript-next",
     "gruntfuggly.todo-tree",
-    "wayou.vscode-todo-highlight",
-    "ms-vscode.sublime-keybindings"
+    "wayou.vscode-todo-highlight"
   ]
 }
