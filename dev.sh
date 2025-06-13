@@ -22,10 +22,39 @@ case "$1" in
         npx expo start --clear --reset-cache
         ;;
     "landscape")
-        echo "📱 Enabling landscape mode on Android emulator..."
+        echo "📱 Setting up landscape mode on Android emulator..."
+        echo "Enabling auto-rotation..."
         adb shell settings put system accelerometer_rotation 1
+        echo "Rotating to landscape..."
+        adb shell settings put system user_rotation 1
         adb shell input keyevent 82
-        echo "Rotation enabled! Use Ctrl+F11/F12 to rotate emulator."
+        echo "✅ Landscape mode enabled! Your clock app should now be in dock mode."
+        ;;
+    "portrait")
+        echo "📱 Setting up portrait mode on Android emulator..."
+        echo "Enabling auto-rotation..."
+        adb shell settings put system accelerometer_rotation 1
+        echo "Rotating to portrait..."
+        adb shell settings put system user_rotation 0
+        echo "✅ Portrait mode enabled!"
+        ;;
+    "rotate-left")
+        echo "🔄 Rotating left..."
+        adb shell settings put system user_rotation 3
+        ;;
+    "rotate-right")
+        echo "🔄 Rotating right..."
+        adb shell settings put system user_rotation 1
+        ;;
+    "auto-rotate")
+        echo "🔄 Enabling auto-rotation..."
+        adb shell settings put system accelerometer_rotation 1
+        echo "✅ Auto-rotation enabled!"
+        ;;
+    "lock-rotation")
+        echo "🔒 Locking current rotation..."
+        adb shell settings put system accelerometer_rotation 0
+        echo "✅ Rotation locked!"
         ;;
     "install")
         echo "📦 Installing dependencies..."
@@ -46,17 +75,26 @@ case "$1" in
     *)
         echo "Usage: ./dev.sh [command]"
         echo ""
-        echo "Commands:"
+        echo "📱 App Commands:"
         echo "  start     - Start Expo development server"
         echo "  android   - Start on Android"
         echo "  ios       - Start on iOS"
         echo "  clean     - Clear cache and restart"
-        echo "  landscape - Enable rotation on Android emulator"
         echo "  install   - Install npm dependencies"
         echo "  doctor    - Run Expo doctor for diagnostics"
+        echo ""
+        echo "🔄 Rotation Commands (Android):"
+        echo "  landscape    - Set landscape mode (for dock usage)"
+        echo "  portrait     - Set portrait mode"
+        echo "  rotate-left  - Rotate 90° left"
+        echo "  rotate-right - Rotate 90° right"
+        echo "  auto-rotate  - Enable auto-rotation"
+        echo "  lock-rotation - Lock current rotation"
+        echo ""
+        echo "🛠️ Utility Commands:"
         echo "  status    - Check if Expo is running"
         echo "  kill      - Kill all Expo processes"
         echo ""
-        echo "Example: ./dev.sh start"
+        echo "Example: ./dev.sh landscape"
         ;;
 esac
