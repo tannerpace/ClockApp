@@ -25,6 +25,7 @@ export const SettingsProvider = ({ children }) => {
     weatherUnit: 'fahrenheit',
     clockType: 'digital',
     showScreenTitles: true,
+    autoHideTabBar: false,
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -76,6 +77,7 @@ export const SettingsProvider = ({ children }) => {
         weatherUnit: 'fahrenheit',
         clockType: 'digital',
         showScreenTitles: true,
+        autoHideTabBar: false,
       };
       setSettings(defaultSettings);
       return defaultSettings;

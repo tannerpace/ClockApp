@@ -151,6 +151,10 @@ const SettingsScreen = () => {
           {renderSwitch('Show Screen Titles', settings.showScreenTitles, value =>
             updateSetting('showScreenTitles', value)
           )}
+
+          {renderSwitch('Auto-hide Tab Bar', settings.autoHideTabBar, value =>
+            updateSetting('autoHideTabBar', value)
+          )}
         </View>
 
         {/* Clock Settings */}
