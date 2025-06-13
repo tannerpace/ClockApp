@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { useBurnIn } from '../contexts/BurnInContext';
 import { useSettings } from '../contexts/SettingsContext';
+import { useTabBar } from '../contexts/TabBarContext';
 import { useWeather } from '../contexts/WeatherContext';
 
 export default function DigitalClock() {
@@ -8,6 +10,8 @@ export default function DigitalClock() {
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
   const { settings } = useSettings();
   const { weather, location } = useWeather();
+  const { getBurnInStyles, getContainerBurnInStyles, resetActivity } = useBurnIn();
+  const { showTabBarAndResetTimer } = useTabBar();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -84,10 +88,10 @@ export default function DigitalClock() {
     // Font size multipliers based on settings
     const fontSizeMultiplier =
       {
-        small: 0.7,
-        medium: 0.9,
-        large: 1.1,
-        xlarge: 1.3,
+        small: 0.8,
+        medium: 1.0,
+        large: 1.4,
+        xlarge: 1.5,
       }[settings.fontSize] || 0.9;
 
     // Base font sizes that fit within screen width
@@ -105,12 +109,12 @@ export default function DigitalClock() {
     // Generate dynamic styles based on new styling options
     const getFontWeight = () => {
       const weights = {
-        ultralight: '100',
-        light: '200',
-        normal: '300',
-        medium: '500',
-        bold: '700',
-        extrabold: '800',
+        ultralight: '200',
+        light: '300',
+        normal: '400',
+        medium: '600',
+        bold: '800',
+        extrabold: '900',
       };
       return weights[settings.clockFontWeight] || '300';
     };
@@ -120,7 +124,7 @@ export default function DigitalClock() {
         tight: -1,
         normal: 0,
         wide: 2,
-        extrawide: 4,
+        extrawide: 5,
       };
       return spacings[settings.clockLetterSpacing] || 0;
     };
@@ -131,9 +135,9 @@ export default function DigitalClock() {
       // Regular shadow
       if (settings.clockShadow) {
         const intensities = {
-          light: { shadowRadius: 4, shadowOpacity: 0.3 },
-          medium: { shadowRadius: 8, shadowOpacity: 0.5 },
-          strong: { shadowRadius: 12, shadowOpacity: 0.7 },
+          light: { shadowRadius: 6, shadowOpacity: 0.5 },
+          medium: { shadowRadius: 10, shadowOpacity: 0.7 },
+          strong: { shadowRadius: 16, shadowOpacity: 0.9 },
         };
 
         shadowStyle = {
@@ -146,9 +150,9 @@ export default function DigitalClock() {
       // Glow effect (simulated with multiple shadows)
       if (settings.clockGlow) {
         const glowIntensities = {
-          light: 6,
-          medium: 12,
-          strong: 20,
+          light: 8,
+          medium: 20,
+          strong: 40,
         };
 
         const glowRadius = glowIntensities[settings.clockGlowIntensity] || 12;
@@ -170,9 +174,9 @@ export default function DigitalClock() {
       if (!settings.clockBorder) return {};
 
       const widths = {
-        thin: 1,
-        medium: 2,
-        thick: 3,
+        thin: 2,
+        medium: 3,
+        thick: 4,
       };
 
       return {
@@ -292,81 +296,202 @@ export default function DigitalClock() {
     return location.city || location.region;
   };
 
+  // Get burn-in prevention styles
+  const burnInStyles = getBurnInStyles();
+  const containerBurnInStyles = getContainerBurnInStyles();
+
+  // Ensure text color always uses settings.textColor unless burn-in color rotation is active
+  const currentTextColor = settings.burnInColorRotation ? burnInStyles.color : settings.textColor;
+
+  // Combined touch handler for both burn-in prevention and tab bar
+  const handleTouch = () => {
+    resetActivity(); // Reset burn-in timers
+    showTabBarAndResetTimer(); // Show tab bar
+  };
+
   // Render different layouts for landscape (dock) vs portrait
   if (isLandscape) {
-    // Landscape dock mode - centered layout with glass effect
+    // Landscape dock mode - centered layout with optional glass effect
     return (
-      <View style={[styles.landscapeContainer, dynamicContainerStyle]}>
-        <View style={styles.landscapeGlassContainer}>
-          <View style={styles.landscapeTimeSection}>
-            <View style={responsiveStyles.timeContainer}>
+      <TouchableWithoutFeedback onPress={handleTouch}>
+        <View style={[styles.landscapeContainer, dynamicContainerStyle]}>
+          <View
+            style={[
+              styles.landscapeContentContainer,
+              settings.clockBackgroundBlur && styles.landscapeGlassContainer,
+              containerBurnInStyles,
+            ]}
+          >
+            <View style={styles.landscapeTimeSection}>
+              <View style={responsiveStyles.timeContainer}>
+                <Text
+                  style={[
+                    styles.landscapeTime,
+                    responsiveStyles.time,
+                    {
+                      color: currentTextColor,
+                      transform: burnInStyles.transform,
+                      opacity: burnInStyles.opacity,
+                    },
+                  ]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.6}
+                >
+                  {settings.showSeconds
+                    ? formatTime(currentTime)
+                    : formatTimeNoSeconds(currentTime)}
+                </Text>
+              </View>
               <Text
-                style={[styles.landscapeTime, responsiveStyles.time]}
-                numberOfLines={1}
-                adjustsFontSizeToFit={true}
-                minimumFontScale={0.6}
+                style={[
+                  styles.landscapeDate,
+                  responsiveStyles.date,
+                  {
+                    color: currentTextColor,
+                    opacity: burnInStyles.opacity,
+                  },
+                ]}
               >
-                {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
+                {formatShortDate(currentTime)}
               </Text>
             </View>
-            <Text style={[styles.landscapeDate, responsiveStyles.date]}>
-              {formatShortDate(currentTime)}
-            </Text>
-          </View>
 
-          <View style={styles.landscapeInfoSection}>
-            <Text style={[styles.landscapeGreeting, responsiveStyles.greeting]}>
-              Good {getTimeOfDay(currentTime)}
-            </Text>
-            {settings.clockShowWeather && weather && (
-              <View style={styles.landscapeWeatherContainer}>
-                <Text style={[styles.landscapeWeather, responsiveStyles.weather]}>
-                  {getWeatherTemperature()}°{getWeatherUnit()}
-                </Text>
-                <Text style={[styles.landscapeWeatherCondition, responsiveStyles.weatherCondition]}>
-                  {getWeatherCondition()}
-                </Text>
-                {location && (
-                  <Text style={[styles.landscapeWeatherLocation, responsiveStyles.weatherLocation]}>
-                    {getLocationName()}
+            <View style={styles.landscapeInfoSection}>
+              <Text
+                style={[
+                  styles.landscapeGreeting,
+                  responsiveStyles.greeting,
+                  {
+                    color: currentTextColor,
+                    opacity: burnInStyles.opacity,
+                  },
+                ]}
+              >
+                Good {getTimeOfDay(currentTime)}
+              </Text>
+              {settings.clockShowWeather && weather && (
+                <View style={styles.landscapeWeatherContainer}>
+                  <Text
+                    style={[
+                      styles.landscapeWeather,
+                      responsiveStyles.weather,
+                      {
+                        color: currentTextColor,
+                        opacity: burnInStyles.opacity,
+                      },
+                    ]}
+                  >
+                    {getWeatherTemperature()}°{getWeatherUnit()}
                   </Text>
-                )}
-              </View>
-            )}
+                  <Text
+                    style={[
+                      styles.landscapeWeatherCondition,
+                      responsiveStyles.weatherCondition,
+                      {
+                        color: currentTextColor,
+                        opacity: burnInStyles.opacity,
+                      },
+                    ]}
+                  >
+                    {getWeatherCondition()}
+                  </Text>
+                  {location && (
+                    <Text
+                      style={[
+                        styles.landscapeWeatherLocation,
+                        responsiveStyles.weatherLocation,
+                        {
+                          color: currentTextColor,
+                          opacity: burnInStyles.opacity,
+                        },
+                      ]}
+                    >
+                      {getLocationName()}
+                    </Text>
+                  )}
+                </View>
+              )}
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 
   // Portrait mode - traditional layout
   return (
-    <View style={[styles.container, dynamicContainerStyle]}>
-      <View style={styles.portraitGlassContainer}>
-        <Text style={[styles.greeting, responsiveStyles.greeting]}>
-          Good {getTimeOfDay(currentTime)}
-        </Text>
-        <View style={responsiveStyles.timeContainer}>
+    <TouchableWithoutFeedback onPress={handleTouch}>
+      <View style={[styles.container, dynamicContainerStyle]}>
+        <View
+          style={[
+            styles.portraitContentContainer,
+            settings.clockBackgroundBlur && styles.portraitGlassContainer,
+            containerBurnInStyles,
+          ]}
+        >
           <Text
-            style={[styles.time, responsiveStyles.time]}
-            numberOfLines={1}
-            adjustsFontSizeToFit={true}
-            minimumFontScale={0.5}
+            style={[
+              styles.greeting,
+              responsiveStyles.greeting,
+              {
+                color: currentTextColor,
+                opacity: burnInStyles.opacity,
+              },
+            ]}
           >
-            {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
+            Good {getTimeOfDay(currentTime)}
           </Text>
-        </View>
-        <Text style={[styles.date, responsiveStyles.date]}>{formatDate(currentTime)}</Text>
-        {settings.clockShowWeather && weather && (
-          <View style={styles.weatherContainer}>
-            <Text style={[styles.weather, responsiveStyles.weather]}>
-              {getWeatherTemperature()}°{getWeatherUnit()} • {getWeatherCondition()}
-              {location && ` • ${getLocationName()}`}
+          <View style={responsiveStyles.timeContainer}>
+            <Text
+              style={[
+                styles.time,
+                responsiveStyles.time,
+                {
+                  color: currentTextColor,
+                  transform: burnInStyles.transform,
+                  opacity: burnInStyles.opacity,
+                },
+              ]}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.5}
+            >
+              {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
             </Text>
           </View>
-        )}
+          <Text
+            style={[
+              styles.date,
+              responsiveStyles.date,
+              {
+                color: currentTextColor,
+                opacity: burnInStyles.opacity,
+              },
+            ]}
+          >
+            {formatDate(currentTime)}
+          </Text>
+          {settings.clockShowWeather && weather && (
+            <View style={styles.weatherContainer}>
+              <Text
+                style={[
+                  styles.weather,
+                  responsiveStyles.weather,
+                  {
+                    color: currentTextColor,
+                    opacity: burnInStyles.opacity,
+                  },
+                ]}
+              >
+                {getWeatherTemperature()}°{getWeatherUnit()} • {getWeatherCondition()}
+                {location && ` • ${getLocationName()}`}
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -376,6 +501,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     paddingHorizontal: 20,
+  },
+  portraitContentContainer: {
+    padding: 35,
+    width: '90%',
+    alignItems: 'center',
   },
   portraitGlassContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
@@ -397,6 +527,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     paddingHorizontal: 40,
+  },
+  landscapeContentContainer: {
+    padding: 30,
+    minWidth: '80%',
+    maxWidth: '90%',
+    alignItems: 'center',
   },
   landscapeGlassContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',

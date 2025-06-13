@@ -1,20 +1,7 @@
-import { useCallback } from 'react';
-import {
-  Dimensions,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { useFullscreen } from '../contexts/FullscreenContext';
 import { useSettings } from '../contexts/SettingsContext';
 import { useTabBar } from '../contexts/TabBarContext';
-
-const { width, height } = Dimensions.get('window');
-const isLandscape = width > height;
 
 const SettingsScreen = () => {
   const { settings, updateSettings } = useSettings();
@@ -25,443 +12,492 @@ const SettingsScreen = () => {
     showTabBarAndResetTimer();
   };
 
-  const backgroundColors = [
-    { name: 'Black', value: '#000000' },
-    { name: 'Dark Blue', value: '#001122' },
-    { name: 'Dark Green', value: '#002200' },
-    { name: 'Dark Purple', value: '#220044' },
-    { name: 'Dark Red', value: '#220000' },
-    { name: 'Navy', value: '#000044' },
-    { name: 'Charcoal', value: '#333333' },
-    { name: 'Midnight', value: '#191970' },
-  ];
+  const updateSetting = (key, value) => {
+    updateSettings({ [key]: value });
+  };
 
-  const textColors = [
-    { name: 'White', value: '#FFFFFF' },
-    { name: 'Light Blue', value: '#87CEEB' },
-    { name: 'Light Green', value: '#90EE90' },
-    { name: 'Yellow', value: '#FFFF00' },
-    { name: 'Orange', value: '#FFA500' },
-    { name: 'Pink', value: '#FFB6C1' },
-    { name: 'Cyan', value: '#00FFFF' },
-    { name: 'Lime', value: '#00FF00' },
-  ];
-
-  const themes = [
-    { name: 'Dark', value: 'dark' },
-    { name: 'Light', value: 'light' },
-    { name: 'Auto', value: 'auto' },
-  ];
-
-  const fontSizes = [
-    { name: 'Small', value: 'small' },
-    { name: 'Medium', value: 'medium' },
-    { name: 'Large', value: 'large' },
-    { name: 'Extra Large', value: 'xlarge' },
-  ];
-
-  const updateSetting = useCallback(
-    (key, value) => {
-      updateSettings({ [key]: value });
-    },
-    [updateSettings]
-  );
-
-  const renderColorPicker = (title, colors, currentValue, onSelect) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={styles.colorGrid}>
-        {colors.map(color => (
-          <TouchableOpacity
-            key={color.value}
-            style={[
-              styles.colorButton,
-              { backgroundColor: color.value },
-              currentValue === color.value && styles.selectedColor,
-            ]}
-            onPress={() => onSelect(color.value)}
-          >
-            {currentValue === color.value && <Text style={styles.checkmark}>✓</Text>}
-          </TouchableOpacity>
-        ))}
+  // Render a clean settings row with Apple-style design
+  const renderSettingRow = (title, value, onToggle, subtitle = null) => (
+    <View style={styles.settingRow}>
+      <View style={styles.settingContent}>
+        <Text style={styles.settingTitle}>{title}</Text>
+        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
       </View>
-    </View>
-  );
-
-  const renderOptionPicker = (title, options, currentValue, onSelect) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={styles.optionGrid}>
-        {options.map(option => (
-          <TouchableOpacity
-            key={option.value}
-            style={[styles.optionButton, currentValue === option.value && styles.selectedOption]}
-            onPress={() => onSelect(option.value)}
-          >
-            <Text
-              style={[
-                styles.optionText,
-                currentValue === option.value && styles.selectedOptionText,
-              ]}
-            >
-              {option.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  );
-
-  const renderSwitch = (title, value, onToggle) => (
-    <View style={styles.switchRow}>
-      <Text style={styles.switchTitle}>{title}</Text>
       <Switch
         value={value}
         onValueChange={onToggle}
-        trackColor={{ false: '#767577', true: '#81b0ff' }}
-        thumbColor={value ? '#f5dd4b' : '#f4f3f4'}
+        trackColor={{ false: '#3E3E3E', true: '#007AFF' }}
+        thumbColor={value ? '#FFFFFF' : '#F4F3F4'}
+        ios_backgroundColor="#3E3E3E"
       />
     </View>
   );
 
+  // Render a selection row with Apple-style design
+  const renderSelectionRow = (title, currentValue, options, onSelect, subtitle = null) => (
+    <View style={styles.selectionSection}>
+      <View style={styles.selectionHeader}>
+        <Text style={styles.settingTitle}>{title}</Text>
+        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+      </View>
+      <View style={styles.optionsContainer}>
+        {options.map((option, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[styles.optionRow, index === options.length - 1 && styles.lastOptionRow]}
+            onPress={() => onSelect(option.value)}
+          >
+            <Text style={styles.optionText}>{option.name || option.label}</Text>
+            {currentValue === option.value && <Text style={styles.checkmark}>✓</Text>}
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  );
+
+  // Render a color picker with visual indicators
+  const renderColorPicker = (
+    title,
+    currentValue,
+    options,
+    onSelect,
+    subtitle = null,
+    showAsText = false
+  ) => (
+    <View style={styles.selectionSection}>
+      <View style={styles.selectionHeader}>
+        <Text style={styles.settingTitle}>{title}</Text>
+        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+      </View>
+      <View style={styles.optionsContainer}>
+        {options.map((option, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[styles.optionRow, index === options.length - 1 && styles.lastOptionRow]}
+            onPress={() => onSelect(option.value)}
+          >
+            <View style={styles.colorOptionContent}>
+              {showAsText ? (
+                <Text style={[styles.optionText, { color: option.value }]}>{option.name}</Text>
+              ) : (
+                <>
+                  <View style={[styles.colorBlob, { backgroundColor: option.value }]} />
+                  <Text style={styles.optionText}>{option.name}</Text>
+                </>
+              )}
+            </View>
+            {currentValue === option.value && <Text style={styles.checkmark}>✓</Text>}
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  );
+
+  // Render section header
+  const renderSectionHeader = title => <Text style={styles.sectionHeader}>{title}</Text>;
+
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
+    <ScrollView
+      style={[styles.container, { backgroundColor: settings.backgroundColor }]}
+      contentContainerStyle={styles.contentContainer}
+      onTouchStart={handleTouch}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Display Settings */}
+      {renderSectionHeader('Display')}
+      <View style={styles.section}>
+        {renderSettingRow(
+          'Immersive Mode',
+          isFullscreen,
+          toggleFullscreen,
+          'Hide status and navigation bars'
+        )}
+        {renderSettingRow(
+          'Keep Screen Awake',
+          settings.keepAwake,
+          value => updateSetting('keepAwake', value),
+          'Prevent screen from sleeping'
+        )}
+        {renderSettingRow(
+          'Glass Effect',
+          settings.clockBackgroundBlur,
+          value => updateSetting('clockBackgroundBlur', value),
+          'Frosted glass background'
+        )}
+      </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        onTouchStart={handleTouch}
-      >
-        {/* Appearance Section */}
-        <View style={styles.category}>
-          <Text style={styles.categoryTitle}>🎨 Appearance</Text>
+      {/* Clock Settings */}
+      {renderSectionHeader('Clock')}
+      <View style={styles.section}>
+        {renderSelectionRow(
+          'Clock Style',
+          settings.clockType,
+          [
+            { name: 'Digital', value: 'digital' },
+            { name: 'Analog', value: 'analog' },
+            { name: 'World Clock', value: 'world' },
+          ],
+          type => updateSetting('clockType', type)
+        )}
 
-          {renderColorPicker(
-            'Background Color',
-            backgroundColors,
-            settings.backgroundColor,
-            color => updateSetting('backgroundColor', color)
-          )}
+        {renderSettingRow('Show Seconds', settings.showSeconds, value =>
+          updateSetting('showSeconds', value)
+        )}
 
-          {renderColorPicker('Text Color', textColors, settings.textColor, color =>
-            updateSetting('textColor', color)
-          )}
+        {renderSettingRow('24-Hour Format', settings.format24Hour, value =>
+          updateSetting('format24Hour', value)
+        )}
 
-          {renderOptionPicker('Font Size', fontSizes, settings.fontSize, size =>
-            updateSetting('fontSize', size)
-          )}
+        {renderSelectionRow(
+          'Text Size',
+          settings.fontSize,
+          [
+            { name: 'Small', value: 'small' },
+            { name: 'Medium', value: 'medium' },
+            { name: 'Large', value: 'large' },
+            { name: 'Extra Large', value: 'xlarge' },
+          ],
+          size => updateSetting('fontSize', size)
+        )}
+      </View>
 
-          {renderSwitch('Show Screen Titles', settings.showScreenTitles, value =>
-            updateSetting('showScreenTitles', value)
-          )}
-
-          {renderSwitch('Auto-hide Tab Bar', settings.autoHideTabBar, value =>
-            updateSetting('autoHideTabBar', value)
-          )}
-
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Immersive Fullscreen</Text>
-            <Switch
-              value={isFullscreen}
-              onValueChange={toggleFullscreen}
-              trackColor={{ false: '#767577', true: '#81b0ff' }}
-              thumbColor={isFullscreen ? '#f5dd4b' : '#f4f3f4'}
-            />
-          </View>
-        </View>
-
-        {/* Clock Settings */}
-        <View style={styles.category}>
-          <Text style={styles.categoryTitle}>🕐 Clock Settings</Text>
-
-          {renderOptionPicker(
-            'Clock Type',
-            [
-              { name: 'Digital', value: 'digital' },
-              { name: 'Analog', value: 'analog' },
-              { name: 'World Clock', value: 'world' },
-            ],
-            settings.clockType,
-            type => updateSetting('clockType', type)
-          )}
-
-          {renderSwitch('Show Seconds', settings.showSeconds, value =>
-            updateSetting('showSeconds', value)
-          )}
-
-          {renderSwitch('24 Hour Format', settings.format24Hour, value =>
-            updateSetting('format24Hour', value)
-          )}
-
-          {renderSwitch('Keep Screen Awake', settings.keepAwake, value =>
-            updateSetting('keepAwake', value)
-          )}
-        </View>
-
-        {/* Digital Clock Styling - Only show when digital clock is selected */}
-        {settings.clockType === 'digital' && (
-          <View style={styles.category}>
-            <Text style={styles.categoryTitle}>✨ Digital Clock Style</Text>
-
-            {renderSwitch('Drop Shadow', settings.clockShadow, value =>
-              updateSetting('clockShadow', value)
+      {/* Digital Clock Style - Only show when digital clock is selected */}
+      {settings.clockType === 'digital' && (
+        <>
+          {renderSectionHeader('Digital Clock Style')}
+          <View style={styles.section}>
+            {renderSettingRow(
+              'Border',
+              settings.clockBorder,
+              value => updateSetting('clockBorder', value),
+              'Add border around clock'
             )}
 
-            {settings.clockShadow &&
-              renderColorPicker(
-                'Shadow Color',
+            {settings.clockBorder &&
+              renderSelectionRow(
+                'Border Width',
+                settings.clockBorderWidth,
                 [
-                  { name: 'Black', value: '#000000' },
-                  { name: 'Dark Gray', value: '#333333' },
-                  { name: 'Red', value: '#990000' },
-                  { name: 'Blue', value: '#000099' },
-                  { name: 'Purple', value: '#660066' },
+                  { name: 'Thin', value: 'thin' },
+                  { name: 'Medium', value: 'medium' },
+                  { name: 'Thick', value: 'thick' },
                 ],
-                settings.clockShadowColor,
-                color => updateSetting('clockShadowColor', color)
+                width => updateSetting('clockBorderWidth', width)
               )}
-
-            {settings.clockShadow &&
-              renderOptionPicker(
-                'Shadow Intensity',
-                [
-                  { label: 'Light', value: 'light' },
-                  { label: 'Medium', value: 'medium' },
-                  { label: 'Strong', value: 'strong' },
-                ],
-                settings.clockShadowIntensity,
-                intensity => updateSetting('clockShadowIntensity', intensity)
-              )}
-
-            {renderSwitch('Glow Effect', settings.clockGlow, value =>
-              updateSetting('clockGlow', value)
-            )}
-
-            {settings.clockGlow &&
-              renderColorPicker(
-                'Glow Color',
-                [
-                  { name: 'White', value: '#FFFFFF' },
-                  { name: 'Blue', value: '#00AAFF' },
-                  { name: 'Green', value: '#00FF88' },
-                  { name: 'Purple', value: '#AA00FF' },
-                  { name: 'Red', value: '#FF0044' },
-                  { name: 'Yellow', value: '#FFAA00' },
-                ],
-                settings.clockGlowColor,
-                color => updateSetting('clockGlowColor', color)
-              )}
-
-            {settings.clockGlow &&
-              renderOptionPicker(
-                'Glow Intensity',
-                [
-                  { label: 'Subtle', value: 'light' },
-                  { label: 'Medium', value: 'medium' },
-                  { label: 'Bright', value: 'strong' },
-                ],
-                settings.clockGlowIntensity,
-                intensity => updateSetting('clockGlowIntensity', intensity)
-              )}
-
-            {renderSwitch('Border', settings.clockBorder, value =>
-              updateSetting('clockBorder', value)
-            )}
 
             {settings.clockBorder &&
               renderColorPicker(
                 'Border Color',
+                settings.clockBorderColor,
                 [
                   { name: 'White', value: '#FFFFFF' },
-                  { name: 'Gray', value: '#888888' },
-                  { name: 'Blue', value: '#0088FF' },
-                  { name: 'Green', value: '#00CC66' },
-                  { name: 'Red', value: '#FF4444' },
+                  { name: 'Light Blue', value: '#87CEEB' },
+                  { name: 'Light Green', value: '#90EE90' },
+                  { name: 'Yellow', value: '#FFFF00' },
+                  { name: 'Orange', value: '#FFA500' },
+                  { name: 'Pink', value: '#FFB6C1' },
+                  { name: 'Cyan', value: '#00FFFF' },
+                  { name: 'Silver', value: '#C0C0C0' },
                 ],
-                settings.clockBorderColor,
-                color => updateSetting('clockBorderColor', color)
+                color => updateSetting('clockBorderColor', color),
+                null,
+                false
               )}
 
-            {settings.clockBorder &&
-              renderOptionPicker(
-                'Border Width',
-                [
-                  { label: 'Thin', value: 'thin' },
-                  { label: 'Medium', value: 'medium' },
-                  { label: 'Thick', value: 'thick' },
-                ],
-                settings.clockBorderWidth,
-                width => updateSetting('clockBorderWidth', width)
-              )}
+            {renderSettingRow(
+              'Drop Shadow',
+              settings.clockShadow,
+              value => updateSetting('clockShadow', value),
+              'Add shadow behind text'
+            )}
 
-            {renderOptionPicker(
+            {renderSettingRow(
+              'Glow Effect',
+              settings.clockGlow,
+              value => updateSetting('clockGlow', value),
+              'Add glow around text'
+            )}
+
+            {renderSelectionRow(
               'Font Weight',
-              [
-                { label: 'Ultra Light', value: 'ultralight' },
-                { label: 'Light', value: 'light' },
-                { label: 'Normal', value: 'normal' },
-                { label: 'Medium', value: 'medium' },
-                { label: 'Bold', value: 'bold' },
-                { label: 'Extra Bold', value: 'extrabold' },
-              ],
               settings.clockFontWeight,
+              [
+                { name: 'Light', value: 'light' },
+                { name: 'Normal', value: 'normal' },
+                { name: 'Medium', value: 'medium' },
+                { name: 'Bold', value: 'bold' },
+                { name: 'Extra Bold', value: 'extrabold' },
+              ],
               weight => updateSetting('clockFontWeight', weight)
             )}
 
-            {renderOptionPicker(
+            {renderSelectionRow(
               'Letter Spacing',
-              [
-                { label: 'Tight', value: 'tight' },
-                { label: 'Normal', value: 'normal' },
-                { label: 'Wide', value: 'wide' },
-                { label: 'Extra Wide', value: 'extrawide' },
-              ],
               settings.clockLetterSpacing,
+              [
+                { name: 'Tight', value: 'tight' },
+                { name: 'Normal', value: 'normal' },
+                { name: 'Wide', value: 'wide' },
+                { name: 'Extra Wide', value: 'extrawide' },
+              ],
               spacing => updateSetting('clockLetterSpacing', spacing)
             )}
           </View>
+        </>
+      )}
+
+      {/* Weather Settings */}
+      {renderSectionHeader('Weather')}
+      <View style={styles.section}>
+        {renderSettingRow(
+          'Show Weather',
+          settings.showWeather,
+          value => updateSetting('showWeather', value),
+          'Display weather information'
         )}
+        {renderSettingRow(
+          'Weather on Clock',
+          settings.clockShowWeather,
+          value => updateSetting('clockShowWeather', value),
+          'Show weather on main clock screen'
+        )}
+        {renderSelectionRow(
+          'Temperature Unit',
+          settings.weatherUnit,
+          [
+            { name: 'Fahrenheit (°F)', value: 'fahrenheit' },
+            { name: 'Celsius (°C)', value: 'celsius' },
+          ],
+          unit => updateSetting('weatherUnit', unit)
+        )}
+      </View>
 
-        {/* Weather Settings */}
-        <View style={styles.category}>
-          <Text style={styles.categoryTitle}>🌤️ Weather Settings</Text>
+      {/* Appearance Settings */}
+      {renderSectionHeader('Appearance')}
+      <View style={styles.section}>
+        {renderColorPicker(
+          'Background Color',
+          settings.backgroundColor,
+          [
+            { name: 'Black', value: '#000000' },
+            { name: 'Dark Blue', value: '#001122' },
+            { name: 'Dark Green', value: '#002200' },
+            { name: 'Dark Purple', value: '#220044' },
+            { name: 'Dark Red', value: '#220000' },
+            { name: 'Charcoal', value: '#333333' },
+            { name: 'Navy', value: '#000044' },
+            { name: 'Midnight', value: '#191970' },
+            { name: 'Forest Green', value: '#001100' },
+            { name: 'Deep Purple', value: '#330066' },
+            { name: 'Burgundy', value: '#330011' },
+            { name: 'Dark Gray', value: '#2C2C2C' },
+            { name: 'Slate', value: '#1A1A2E' },
+            { name: 'Dark Teal', value: '#003333' },
+            { name: 'Dark Brown', value: '#332211' },
+          ],
+          color => updateSetting('backgroundColor', color),
+          null,
+          false // Show color blobs for background colors
+        )}
+        {renderColorPicker(
+          'Text Color',
+          settings.textColor,
+          [
+            { name: 'White', value: '#FFFFFF' },
+            { name: 'Light Blue', value: '#87CEEB' },
+            { name: 'Light Green', value: '#90EE90' },
+            { name: 'Yellow', value: '#FFFF00' },
+            { name: 'Orange', value: '#FFA500' },
+            { name: 'Pink', value: '#FFB6C1' },
+            { name: 'Cyan', value: '#00FFFF' },
+            { name: 'Lime', value: '#00FF00' },
+            { name: 'Gold', value: '#FFD700' },
+            { name: 'Silver', value: '#C0C0C0' },
+            { name: 'Coral', value: '#FF7F50' },
+            { name: 'Lavender', value: '#E6E6FA' },
+            { name: 'Mint', value: '#98FB98' },
+            { name: 'Peach', value: '#FFCBA4' },
+            { name: 'Sky Blue', value: '#87CEFA' },
+            { name: 'Violet', value: '#DDA0DD' },
+            { name: 'Aqua', value: '#00CED1' },
+            { name: 'Light Orange', value: '#FFB347' },
+            { name: 'Light Purple', value: '#B19CD9' },
+            { name: 'Cream', value: '#F5F5DC' },
+          ],
+          color => updateSetting('textColor', color),
+          null,
+          true // Show colored text for text colors
+        )}
+      </View>
 
-          {renderSwitch('Show Weather', settings.showWeather, value =>
-            updateSetting('showWeather', value)
-          )}
+      {/* Screen Protection */}
+      {renderSectionHeader('Screen Protection')}
+      <View style={styles.section}>
+        {renderSettingRow(
+          'Burn-in Prevention',
+          settings.burnInPrevention,
+          value => updateSetting('burnInPrevention', value),
+          'Protect OLED displays from burn-in'
+        )}
+        {settings.burnInPrevention && (
+          <>
+            {renderSettingRow(
+              'Position Shift',
+              settings.burnInPositionShift,
+              value => updateSetting('burnInPositionShift', value),
+              'Slightly move clock position periodically'
+            )}
+            {settings.burnInPositionShift &&
+              renderSelectionRow(
+                'Position Shift Interval',
+                settings.burnInShiftInterval,
+                [
+                  { name: '2 minutes', value: 120 },
+                  { name: '5 minutes', value: 300 },
+                  { name: '10 minutes', value: 600 },
+                  { name: '15 minutes', value: 900 },
+                ],
+                interval => updateSetting('burnInShiftInterval', interval)
+              )}
+            {renderSettingRow(
+              'Auto Dim',
+              settings.burnInAutoDim,
+              value => updateSetting('burnInAutoDim', value),
+              'Automatically dim display after inactivity'
+            )}
+            {settings.burnInAutoDim &&
+              renderSelectionRow(
+                'Auto-dim After',
+                settings.burnInDimAfter,
+                [
+                  { name: '5 minutes', value: 300 },
+                  { name: '10 minutes', value: 600 },
+                  { name: '15 minutes', value: 900 },
+                  { name: '30 minutes', value: 1800 },
+                ],
+                time => updateSetting('burnInDimAfter', time)
+              )}
+          </>
+        )}
+      </View>
 
-          {renderSwitch('Show Weather on Clock', settings.clockShowWeather, value =>
-            updateSetting('clockShowWeather', value)
-          )}
+      {/* Interface Settings */}
+      {renderSectionHeader('Interface')}
+      <View style={styles.section}>
+        {renderSettingRow(
+          'Auto-hide Navigation',
+          settings.autoHideTabBar,
+          value => updateSetting('autoHideTabBar', value),
+          'Hide navigation bar automatically'
+        )}
+        {renderSettingRow(
+          'Show Screen Titles',
+          settings.showScreenTitles,
+          value => updateSetting('showScreenTitles', value),
+          'Display titles in navigation bar'
+        )}
+      </View>
 
-          {renderOptionPicker(
-            'Temperature Unit',
-            [
-              { name: 'Fahrenheit', value: 'fahrenheit' },
-              { name: 'Celsius', value: 'celsius' },
-            ],
-            settings.weatherUnit,
-            unit => updateSetting('weatherUnit', unit)
-          )}
-        </View>
-
-        {/* Display Settings */}
-        <View style={styles.category}>
-          <Text style={styles.categoryTitle}>📱 Display Settings</Text>
-
-          {renderOptionPicker(
-            'Brightness',
-            [
-              { name: 'Auto', value: 'auto' },
-              { name: 'Low', value: 'low' },
-              { name: 'Medium', value: 'medium' },
-              { name: 'High', value: 'high' },
-            ],
-            settings.brightness,
-            brightness => updateSetting('brightness', brightness)
-          )}
-        </View>
-      </ScrollView>
-    </View>
+      {/* Bottom spacing */}
+      <View style={styles.bottomSpacer} />
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
   },
-  scrollView: {
-    flex: 1,
+  contentContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
-  scrollContent: {
-    paddingBottom: 50,
-  },
-  category: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  categoryTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  sectionHeader: {
+    fontSize: 22,
+    fontWeight: '600',
     color: '#FFFFFF',
-    marginBottom: 20,
+    marginTop: 32,
+    marginBottom: 12,
+    marginLeft: 4,
   },
   section: {
-    marginBottom: 25,
+    backgroundColor: '#1C1C1E',
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: 'hidden',
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#CCCCCC',
-    marginBottom: 12,
-  },
-  colorGrid: {
+  settingRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  colorButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#38383A',
   },
-  selectedColor: {
-    borderColor: '#007AFF',
-    borderWidth: 3,
+  settingContent: {
+    flex: 1,
+    marginRight: 12,
   },
-  checkmark: {
+  settingTitle: {
+    fontSize: 17,
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textShadowColor: '#000000',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    fontWeight: '400',
   },
-  optionGrid: {
+  settingSubtitle: {
+    fontSize: 13,
+    color: '#8E8E93',
+    marginTop: 2,
+  },
+  selectionSection: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#38383A',
+  },
+  selectionHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#38383A',
+  },
+  optionsContainer: {
+    paddingLeft: 32,
+  },
+  optionRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  optionButton: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#333333',
-    borderWidth: 1,
-    borderColor: '#555555',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#38383A',
   },
-  selectedOption: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+  lastOptionRow: {
+    borderBottomWidth: 0,
   },
   optionText: {
-    color: '#CCCCCC',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  selectedOptionText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  switchRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
-  },
-  switchTitle: {
     fontSize: 16,
     color: '#FFFFFF',
-    flex: 1,
+    fontWeight: '400',
+  },
+  colorOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  colorBlob: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#38383A',
+  },
+  checkmark: {
+    fontSize: 16,
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  bottomSpacer: {
+    height: 40,
   },
 });
 

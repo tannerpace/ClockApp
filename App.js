@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 
+import { BurnInProvider } from './contexts/BurnInContext';
 import { FullscreenProvider } from './contexts/FullscreenContext';
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 import { TabBarProvider, useTabBar } from './contexts/TabBarContext';
@@ -100,7 +101,9 @@ export default function App() {
       <WeatherProvider>
         <TabBarProvider>
           <FullscreenProvider>
-            <AppNavigator />
+            <BurnInProvider>
+              <AppNavigator />
+            </BurnInProvider>
           </FullscreenProvider>
         </TabBarProvider>
       </WeatherProvider>

@@ -42,6 +42,15 @@ export const SettingsProvider = ({ children }) => {
     clockFontWeight: 'normal',
     clockLetterSpacing: 'normal',
     clockShowWeather: true,
+    // Screen burn-in prevention
+    burnInPrevention: true,
+    burnInPositionShift: true, // Enable position shifting
+    burnInShiftInterval: 300, // seconds (5 minutes)
+    burnInAutoDim: true, // Enable auto-dimming
+    burnInDimAfter: 600, // seconds (10 minutes)
+    burnInColorRotation: false,
+    burnInSizeVariation: false,
+    burnInScreenTimeout: 0, // 0 = disabled, otherwise minutes
   });
 
   const [isLoading, setIsLoading] = useState(true);
