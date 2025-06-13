@@ -205,7 +205,7 @@ export default function DigitalClock() {
         fontSize: Math.max(14, Math.min(20, baseFontSize * 0.3 * fontSizeMultiplier)),
         marginBottom: isLandscape ? 10 : 20,
         color: settings.textColor,
-        textAlign: isLandscape ? 'right' : 'center',
+        textAlign: 'center',
       },
       date: {
         fontSize: Math.max(12, Math.min(16, baseFontSize * 0.25 * fontSizeMultiplier)),
@@ -214,7 +214,7 @@ export default function DigitalClock() {
       weather: {
         fontSize: Math.max(14, Math.min(18, baseFontSize * 0.3 * fontSizeMultiplier)),
         color: settings.textColor,
-        textAlign: isLandscape ? 'right' : 'center',
+        textAlign: 'center',
         opacity: 0.9,
         marginTop: isLandscape ? 5 : 15,
       },
@@ -222,13 +222,13 @@ export default function DigitalClock() {
         fontSize: Math.max(12, Math.min(16, baseFontSize * 0.25 * fontSizeMultiplier)),
         color: settings.textColor,
         opacity: 0.8,
-        textAlign: isLandscape ? 'right' : 'center',
+        textAlign: 'center',
       },
       weatherLocation: {
         fontSize: Math.max(11, Math.min(14, baseFontSize * 0.22 * fontSizeMultiplier)),
         color: settings.textColor,
         opacity: 0.7,
-        textAlign: isLandscape ? 'right' : 'center',
+        textAlign: 'center',
       },
     };
   };
@@ -294,43 +294,46 @@ export default function DigitalClock() {
 
   // Render different layouts for landscape (dock) vs portrait
   if (isLandscape) {
-    // Landscape dock mode - optimize for side viewing
+    // Landscape dock mode - centered layout with glass effect
     return (
       <View style={[styles.landscapeContainer, dynamicContainerStyle]}>
-        <View style={styles.landscapeTimeSection}>
-          <View style={responsiveStyles.timeContainer}>
-            <Text
-              style={[styles.landscapeTime, responsiveStyles.time]}
-              numberOfLines={1}
-              adjustsFontSizeToFit={true}
-              minimumFontScale={0.6}
-            >
-              {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
+        <View style={styles.landscapeGlassContainer}>
+          <View style={styles.landscapeTimeSection}>
+            <View style={responsiveStyles.timeContainer}>
+              <Text
+                style={[styles.landscapeTime, responsiveStyles.time]}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.6}
+              >
+                {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
+              </Text>
+            </View>
+            <Text style={[styles.landscapeDate, responsiveStyles.date]}>
+              {formatShortDate(currentTime)}
             </Text>
           </View>
-          <Text style={[styles.landscapeDate, responsiveStyles.date]}>
-            {formatShortDate(currentTime)}
-          </Text>
-        </View>
-        <View style={styles.landscapeInfoSection}>
-          <Text style={[styles.landscapeGreeting, responsiveStyles.greeting]}>
-            Good {getTimeOfDay(currentTime)}
-          </Text>
-          {settings.clockShowWeather && weather && (
-            <View style={styles.landscapeWeatherContainer}>
-              <Text style={[styles.landscapeWeather, responsiveStyles.weather]}>
-                {getWeatherTemperature()}°{getWeatherUnit()}
-              </Text>
-              <Text style={[styles.landscapeWeatherCondition, responsiveStyles.weatherCondition]}>
-                {getWeatherCondition()}
-              </Text>
-              {location && (
-                <Text style={[styles.landscapeWeatherLocation, responsiveStyles.weatherLocation]}>
-                  {getLocationName()}
+
+          <View style={styles.landscapeInfoSection}>
+            <Text style={[styles.landscapeGreeting, responsiveStyles.greeting]}>
+              Good {getTimeOfDay(currentTime)}
+            </Text>
+            {settings.clockShowWeather && weather && (
+              <View style={styles.landscapeWeatherContainer}>
+                <Text style={[styles.landscapeWeather, responsiveStyles.weather]}>
+                  {getWeatherTemperature()}°{getWeatherUnit()}
                 </Text>
-              )}
-            </View>
-          )}
+                <Text style={[styles.landscapeWeatherCondition, responsiveStyles.weatherCondition]}>
+                  {getWeatherCondition()}
+                </Text>
+                {location && (
+                  <Text style={[styles.landscapeWeatherLocation, responsiveStyles.weatherLocation]}>
+                    {getLocationName()}
+                  </Text>
+                )}
+              </View>
+            )}
+          </View>
         </View>
       </View>
     );
@@ -339,28 +342,30 @@ export default function DigitalClock() {
   // Portrait mode - traditional layout
   return (
     <View style={[styles.container, dynamicContainerStyle]}>
-      <Text style={[styles.greeting, responsiveStyles.greeting]}>
-        Good {getTimeOfDay(currentTime)}
-      </Text>
-      <View style={responsiveStyles.timeContainer}>
-        <Text
-          style={[styles.time, responsiveStyles.time]}
-          numberOfLines={1}
-          adjustsFontSizeToFit={true}
-          minimumFontScale={0.5}
-        >
-          {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
+      <View style={styles.portraitGlassContainer}>
+        <Text style={[styles.greeting, responsiveStyles.greeting]}>
+          Good {getTimeOfDay(currentTime)}
         </Text>
-      </View>
-      <Text style={[styles.date, responsiveStyles.date]}>{formatDate(currentTime)}</Text>
-      {settings.clockShowWeather && weather && (
-        <View style={styles.weatherContainer}>
-          <Text style={[styles.weather, responsiveStyles.weather]}>
-            {getWeatherTemperature()}°{getWeatherUnit()} • {getWeatherCondition()}
-            {location && ` • ${getLocationName()}`}
+        <View style={responsiveStyles.timeContainer}>
+          <Text
+            style={[styles.time, responsiveStyles.time]}
+            numberOfLines={1}
+            adjustsFontSizeToFit={true}
+            minimumFontScale={0.5}
+          >
+            {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
           </Text>
         </View>
-      )}
+        <Text style={[styles.date, responsiveStyles.date]}>{formatDate(currentTime)}</Text>
+        {settings.clockShowWeather && weather && (
+          <View style={styles.weatherContainer}>
+            <Text style={[styles.weather, responsiveStyles.weather]}>
+              {getWeatherTemperature()}°{getWeatherUnit()} • {getWeatherCondition()}
+              {location && ` • ${getLocationName()}`}
+            </Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -372,21 +377,50 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
-  landscapeContainer: {
-    flexDirection: 'row',
+  portraitGlassContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 25,
+    padding: 35,
+    backdropFilter: 'blur(10px)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 6,
+    width: '90%',
     alignItems: 'center',
-    justifyContent: 'space-between',
+  },
+  landscapeContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
     flex: 1,
     paddingHorizontal: 40,
   },
+  landscapeGlassContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 20,
+    padding: 30,
+    backdropFilter: 'blur(10px)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    minWidth: '80%',
+    maxWidth: '90%',
+    alignItems: 'center',
+  },
   landscapeTimeSection: {
-    flex: 2,
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 20,
   },
   landscapeInfoSection: {
-    flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'center',
   },
   greeting: {
@@ -398,7 +432,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     fontSize: 18,
     marginBottom: 12,
-    textAlign: 'right',
+    textAlign: 'center',
   },
   time: {
     color: '#fff',
@@ -423,6 +457,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     fontSize: 18,
     marginTop: 8,
+    textAlign: 'center',
   },
   weather: {
     color: '#BBB',
@@ -436,7 +471,7 @@ const styles = StyleSheet.create({
     color: '#BBB',
     fontWeight: '400',
     fontSize: 20,
-    textAlign: 'right',
+    textAlign: 'center',
     marginTop: 8,
     marginBottom: 2,
   },
@@ -444,7 +479,7 @@ const styles = StyleSheet.create({
     color: '#999',
     fontWeight: '300',
     fontSize: 16,
-    textAlign: 'right',
+    textAlign: 'center',
     marginTop: 2,
     marginBottom: 1,
     lineHeight: 20,
@@ -453,7 +488,7 @@ const styles = StyleSheet.create({
     color: '#777',
     fontWeight: '300',
     fontSize: 14,
-    textAlign: 'right',
+    textAlign: 'center',
     marginTop: 1,
   },
   weatherContainer: {
@@ -463,8 +498,7 @@ const styles = StyleSheet.create({
   },
   landscapeWeatherContainer: {
     marginTop: 15,
-    alignItems: 'flex-end',
-    justifyContent: 'flex-start',
-    paddingRight: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
