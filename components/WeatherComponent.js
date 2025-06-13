@@ -12,7 +12,7 @@ import {
 import { useSettings } from '../contexts/SettingsContext';
 import { useWeather } from '../contexts/WeatherContext';
 
-export default function WeatherComponent() {
+export default function WeatherComponent({ skipSettingsCheck = false }) {
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
   const { settings } = useSettings();
   const { weather, location, loading, error, refreshWeather } = useWeather();
@@ -73,7 +73,7 @@ export default function WeatherComponent() {
   const responsiveStyles = getResponsiveStyles();
 
   // Show disabled message if weather is turned off in settings
-  if (!settings.showWeather) {
+  if (!skipSettingsCheck && !settings.showWeather) {
     return (
       <View style={styles.errorContainer}>
         <Ionicons name="settings-outline" size={60} color="#8E8E93" />

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { useSettings } from '../contexts/SettingsContext';
+import { useWeather } from '../contexts/WeatherContext';
 
 export default function DigitalClock() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
   const { settings } = useSettings();
+  const { weather, location } = useWeather();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -208,6 +210,23 @@ export default function DigitalClock() {
         fontSize: Math.max(12, Math.min(16, baseFontSize * 0.25 * fontSizeMultiplier)),
         color: settings.textColor,
       },
+      weather: {
+        fontSize: Math.max(14, Math.min(18, baseFontSize * 0.3 * fontSizeMultiplier)),
+        color: settings.textColor,
+        textAlign: 'center',
+        opacity: 0.9,
+        marginTop: isLandscape ? 5 : 15,
+      },
+      weatherCondition: {
+        fontSize: Math.max(9, Math.min(12, baseFontSize * 0.18 * fontSizeMultiplier)),
+        color: settings.textColor,
+        opacity: 0.7,
+      },
+      weatherLocation: {
+        fontSize: Math.max(8, Math.min(10, baseFontSize * 0.15 * fontSizeMultiplier)),
+        color: settings.textColor,
+        opacity: 0.6,
+      },
     };
   };
 
@@ -216,6 +235,58 @@ export default function DigitalClock() {
   // Dynamic container style based on settings
   const dynamicContainerStyle = {
     backgroundColor: settings.backgroundColor,
+  };
+
+  // Weather helper functions
+  const getWeatherTemperature = () => {
+    if (!weather) return '--';
+
+    // Try to get current temperature from observations
+    if (
+      weather.current?.temperature?.value !== null &&
+      weather.current?.temperature?.value !== undefined
+    ) {
+      const tempC = weather.current.temperature.value;
+      return settings.weatherUnit === 'celsius'
+        ? Math.round(tempC)
+        : Math.round((tempC * 9) / 5 + 32);
+    }
+
+    // Fallback to forecast temperature
+    if (weather.forecast?.[0]?.temperature) {
+      const temp = weather.forecast[0].temperature;
+      if (settings.weatherUnit === 'celsius' && weather.forecast[0].temperatureUnit === 'F') {
+        return Math.round(((temp - 32) * 5) / 9);
+      }
+      return temp;
+    }
+
+    return '--';
+  };
+
+  const getWeatherUnit = () => {
+    return settings.weatherUnit === 'celsius' ? 'C' : 'F';
+  };
+
+  const getWeatherCondition = () => {
+    if (!weather) return 'Weather unavailable';
+
+    // Try current conditions first
+    if (weather.current?.textDescription) {
+      return weather.current.textDescription;
+    }
+
+    // Fallback to forecast
+    if (weather.forecast?.[0]?.shortForecast) {
+      return weather.forecast[0].shortForecast;
+    }
+
+    return 'Weather unavailable';
+  };
+
+  const getLocationName = () => {
+    if (!location) return null;
+    return location.city || location.region;
   };
 
   // Render different layouts for landscape (dock) vs portrait
@@ -242,6 +313,21 @@ export default function DigitalClock() {
           <Text style={[styles.landscapeGreeting, responsiveStyles.greeting]}>
             Good {getTimeOfDay(currentTime)}
           </Text>
+          {settings.clockShowWeather && weather && (
+            <View style={styles.landscapeWeatherContainer}>
+              <Text style={[styles.landscapeWeather, responsiveStyles.weather]}>
+                {getWeatherTemperature()}°{getWeatherUnit()}
+              </Text>
+              <Text style={[styles.landscapeWeatherCondition, responsiveStyles.weatherCondition]}>
+                {getWeatherCondition()}
+              </Text>
+              {location && (
+                <Text style={[styles.landscapeWeatherLocation, responsiveStyles.weatherLocation]}>
+                  {getLocationName()}
+                </Text>
+              )}
+            </View>
+          )}
         </View>
       </View>
     );
@@ -264,6 +350,14 @@ export default function DigitalClock() {
         </Text>
       </View>
       <Text style={[styles.date, responsiveStyles.date]}>{formatDate(currentTime)}</Text>
+      {settings.clockShowWeather && weather && (
+        <View style={styles.weatherContainer}>
+          <Text style={[styles.weather, responsiveStyles.weather]}>
+            {getWeatherTemperature()}°{getWeatherUnit()} • {getWeatherCondition()}
+            {location && ` • ${getLocationName()}`}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -324,5 +418,43 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     fontSize: 18,
     marginTop: 8,
+  },
+  weather: {
+    color: '#BBB',
+    fontWeight: '400',
+    textAlign: 'center',
+    marginTop: 15,
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  landscapeWeather: {
+    color: '#888',
+    fontWeight: '300',
+    fontSize: 16,
+    textAlign: 'left',
+  },
+  landscapeWeatherCondition: {
+    color: '#888',
+    fontWeight: '300',
+    fontSize: 12,
+    textAlign: 'left',
+    marginTop: 2,
+  },
+  landscapeWeatherLocation: {
+    color: '#888',
+    fontWeight: '300',
+    fontSize: 10,
+    textAlign: 'left',
+    marginTop: 2,
+  },
+  weatherContainer: {
+    marginTop: 15,
+    width: '100%',
+    // Remove height constraints that might hide content
+  },
+  landscapeWeatherContainer: {
+    marginTop: 10,
+    width: '100%',
+    // Remove height constraints and flex that might hide content
   },
 });

@@ -41,7 +41,7 @@ export const SettingsProvider = ({ children }) => {
     clockBackgroundBlur: false,
     clockFontWeight: 'normal',
     clockLetterSpacing: 'normal',
-    clockShowWeather: false,
+    clockShowWeather: true,
   });
 
   const [isLoading, setIsLoading] = useState(true);

@@ -197,86 +197,92 @@ const SettingsScreen = () => {
               updateSetting('clockShadow', value)
             )}
 
-            {settings.clockShadow && renderColorPicker(
-              'Shadow Color',
-              [
-                { name: 'Black', value: '#000000' },
-                { name: 'Dark Gray', value: '#333333' },
-                { name: 'Red', value: '#990000' },
-                { name: 'Blue', value: '#000099' },
-                { name: 'Purple', value: '#660066' },
-              ],
-              settings.clockShadowColor,
-              color => updateSetting('clockShadowColor', color)
-            )}
+            {settings.clockShadow &&
+              renderColorPicker(
+                'Shadow Color',
+                [
+                  { name: 'Black', value: '#000000' },
+                  { name: 'Dark Gray', value: '#333333' },
+                  { name: 'Red', value: '#990000' },
+                  { name: 'Blue', value: '#000099' },
+                  { name: 'Purple', value: '#660066' },
+                ],
+                settings.clockShadowColor,
+                color => updateSetting('clockShadowColor', color)
+              )}
 
-            {settings.clockShadow && renderOptionPicker(
-              'Shadow Intensity',
-              [
-                { label: 'Light', value: 'light' },
-                { label: 'Medium', value: 'medium' },
-                { label: 'Strong', value: 'strong' },
-              ],
-              settings.clockShadowIntensity,
-              intensity => updateSetting('clockShadowIntensity', intensity)
-            )}
+            {settings.clockShadow &&
+              renderOptionPicker(
+                'Shadow Intensity',
+                [
+                  { label: 'Light', value: 'light' },
+                  { label: 'Medium', value: 'medium' },
+                  { label: 'Strong', value: 'strong' },
+                ],
+                settings.clockShadowIntensity,
+                intensity => updateSetting('clockShadowIntensity', intensity)
+              )}
 
             {renderSwitch('Glow Effect', settings.clockGlow, value =>
               updateSetting('clockGlow', value)
             )}
 
-            {settings.clockGlow && renderColorPicker(
-              'Glow Color',
-              [
-                { name: 'White', value: '#FFFFFF' },
-                { name: 'Blue', value: '#00AAFF' },
-                { name: 'Green', value: '#00FF88' },
-                { name: 'Purple', value: '#AA00FF' },
-                { name: 'Red', value: '#FF0044' },
-                { name: 'Yellow', value: '#FFAA00' },
-              ],
-              settings.clockGlowColor,
-              color => updateSetting('clockGlowColor', color)
-            )}
+            {settings.clockGlow &&
+              renderColorPicker(
+                'Glow Color',
+                [
+                  { name: 'White', value: '#FFFFFF' },
+                  { name: 'Blue', value: '#00AAFF' },
+                  { name: 'Green', value: '#00FF88' },
+                  { name: 'Purple', value: '#AA00FF' },
+                  { name: 'Red', value: '#FF0044' },
+                  { name: 'Yellow', value: '#FFAA00' },
+                ],
+                settings.clockGlowColor,
+                color => updateSetting('clockGlowColor', color)
+              )}
 
-            {settings.clockGlow && renderOptionPicker(
-              'Glow Intensity',
-              [
-                { label: 'Subtle', value: 'light' },
-                { label: 'Medium', value: 'medium' },
-                { label: 'Bright', value: 'strong' },
-              ],
-              settings.clockGlowIntensity,
-              intensity => updateSetting('clockGlowIntensity', intensity)
-            )}
+            {settings.clockGlow &&
+              renderOptionPicker(
+                'Glow Intensity',
+                [
+                  { label: 'Subtle', value: 'light' },
+                  { label: 'Medium', value: 'medium' },
+                  { label: 'Bright', value: 'strong' },
+                ],
+                settings.clockGlowIntensity,
+                intensity => updateSetting('clockGlowIntensity', intensity)
+              )}
 
             {renderSwitch('Border', settings.clockBorder, value =>
               updateSetting('clockBorder', value)
             )}
 
-            {settings.clockBorder && renderColorPicker(
-              'Border Color',
-              [
-                { name: 'White', value: '#FFFFFF' },
-                { name: 'Gray', value: '#888888' },
-                { name: 'Blue', value: '#0088FF' },
-                { name: 'Green', value: '#00CC66' },
-                { name: 'Red', value: '#FF4444' },
-              ],
-              settings.clockBorderColor,
-              color => updateSetting('clockBorderColor', color)
-            )}
+            {settings.clockBorder &&
+              renderColorPicker(
+                'Border Color',
+                [
+                  { name: 'White', value: '#FFFFFF' },
+                  { name: 'Gray', value: '#888888' },
+                  { name: 'Blue', value: '#0088FF' },
+                  { name: 'Green', value: '#00CC66' },
+                  { name: 'Red', value: '#FF4444' },
+                ],
+                settings.clockBorderColor,
+                color => updateSetting('clockBorderColor', color)
+              )}
 
-            {settings.clockBorder && renderOptionPicker(
-              'Border Width',
-              [
-                { label: 'Thin', value: 'thin' },
-                { label: 'Medium', value: 'medium' },
-                { label: 'Thick', value: 'thick' },
-              ],
-              settings.clockBorderWidth,
-              width => updateSetting('clockBorderWidth', width)
-            )}
+            {settings.clockBorder &&
+              renderOptionPicker(
+                'Border Width',
+                [
+                  { label: 'Thin', value: 'thin' },
+                  { label: 'Medium', value: 'medium' },
+                  { label: 'Thick', value: 'thick' },
+                ],
+                settings.clockBorderWidth,
+                width => updateSetting('clockBorderWidth', width)
+              )}
 
             {renderOptionPicker(
               'Font Weight',
@@ -312,6 +318,10 @@ const SettingsScreen = () => {
 
           {renderSwitch('Show Weather', settings.showWeather, value =>
             updateSetting('showWeather', value)
+          )}
+
+          {renderSwitch('Show Weather on Clock', settings.clockShowWeather, value =>
+            updateSetting('clockShowWeather', value)
           )}
 
           {renderOptionPicker(
