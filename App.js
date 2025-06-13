@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
 import { TabBarProvider, useTabBar } from './contexts/TabBarContext';
+import { WeatherProvider } from './contexts/WeatherContext';
 import ClockScreen from './screens/ClockScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import TimerScreen from './screens/TimerScreen';
@@ -95,9 +96,11 @@ function AppNavigator() {
 export default function App() {
   return (
     <SettingsProvider>
-      <TabBarProvider>
-        <AppNavigator />
-      </TabBarProvider>
+      <WeatherProvider>
+        <TabBarProvider>
+          <AppNavigator />
+        </TabBarProvider>
+      </WeatherProvider>
     </SettingsProvider>
   );
 }

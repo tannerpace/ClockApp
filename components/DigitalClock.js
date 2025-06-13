@@ -125,7 +125,7 @@ export default function DigitalClock() {
 
     const getShadowStyle = () => {
       let shadowStyle = {};
-      
+
       // Regular shadow
       if (settings.clockShadow) {
         const intensities = {
@@ -133,14 +133,14 @@ export default function DigitalClock() {
           medium: { shadowRadius: 8, shadowOpacity: 0.5 },
           strong: { shadowRadius: 12, shadowOpacity: 0.7 },
         };
-        
+
         shadowStyle = {
           textShadowColor: settings.clockShadowColor,
           textShadowOffset: { width: 2, height: 2 },
           textShadowRadius: intensities[settings.clockShadowIntensity]?.shadowRadius || 8,
         };
       }
-      
+
       // Glow effect (simulated with multiple shadows)
       if (settings.clockGlow) {
         const glowIntensities = {
@@ -148,9 +148,9 @@ export default function DigitalClock() {
           medium: 12,
           strong: 20,
         };
-        
+
         const glowRadius = glowIntensities[settings.clockGlowIntensity] || 12;
-        
+
         // Override or combine with shadow
         shadowStyle = {
           textShadowColor: settings.clockGlowColor,
@@ -160,19 +160,19 @@ export default function DigitalClock() {
           elevation: settings.clockGlow ? 8 : 0,
         };
       }
-      
+
       return shadowStyle;
     };
 
     const getBorderStyle = () => {
       if (!settings.clockBorder) return {};
-      
+
       const widths = {
         thin: 1,
         medium: 2,
         thick: 3,
       };
-      
+
       return {
         borderWidth: widths[settings.clockBorderWidth] || 1,
         borderColor: settings.clockBorderColor,
@@ -182,6 +182,7 @@ export default function DigitalClock() {
       };
     };
 
+    // Main return statement for getResponsiveStyles
     return {
       time: {
         fontSize: Math.max(24, baseFontSize * fontSizeMultiplier),
@@ -197,7 +198,6 @@ export default function DigitalClock() {
       },
       timeContainer: {
         ...getBorderStyle(),
-      },
       },
       greeting: {
         fontSize: Math.max(14, Math.min(20, baseFontSize * 0.3 * fontSizeMultiplier)),
