@@ -147,11 +147,26 @@ const SettingsScreen = () => {
           {renderOptionPicker('Font Size', fontSizes, settings.fontSize, size =>
             updateSetting('fontSize', size)
           )}
+
+          {renderSwitch('Show Screen Titles', settings.showScreenTitles, value =>
+            updateSetting('showScreenTitles', value)
+          )}
         </View>
 
         {/* Clock Settings */}
         <View style={styles.category}>
           <Text style={styles.categoryTitle}>🕐 Clock Settings</Text>
+
+          {renderOptionPicker(
+            'Clock Type',
+            [
+              { name: 'Digital', value: 'digital' },
+              { name: 'Analog', value: 'analog' },
+              { name: 'World Clock', value: 'world' },
+            ],
+            settings.clockType,
+            type => updateSetting('clockType', type)
+          )}
 
           {renderSwitch('Show Seconds', settings.showSeconds, value =>
             updateSetting('showSeconds', value)

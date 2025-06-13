@@ -23,7 +23,8 @@ export const SettingsProvider = ({ children }) => {
     fontSize: 'medium',
     showWeather: true,
     weatherUnit: 'fahrenheit',
-    clockStyle: 'digital',
+    clockType: 'digital',
+    showScreenTitles: true,
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -73,7 +74,8 @@ export const SettingsProvider = ({ children }) => {
         fontSize: 'medium',
         showWeather: true,
         weatherUnit: 'fahrenheit',
-        clockStyle: 'digital',
+        clockType: 'digital',
+        showScreenTitles: true,
       };
       setSettings(defaultSettings);
       return defaultSettings;
