@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSettings } from '../contexts/SettingsContext';
 
 export default function WeatherComponent() {
   const [weather, setWeather] = useState(null);
@@ -9,22 +10,26 @@ export default function WeatherComponent() {
   const [error, setError] = useState(null);
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
   const [lastFetch, setLastFetch] = useState(null);
+  const { settings } = useSettings();
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({ window }) => {
       setScreenDimensions(window);
     });
 
-    // Only fetch if we haven't fetched in the last 10 minutes
-    const now = Date.now();
-    if (!lastFetch || now - lastFetch > 10 * 60 * 1000) {
-      fetchWeatherData();
+    // Only fetch weather if the user has enabled it
+    if (settings.showWeather) {
+      // Only fetch if we haven't fetched in the last 10 minutes
+      const now = Date.now();
+      if (!lastFetch || now - lastFetch > 10 * 60 * 1000) {
+        fetchWeatherData();
+      }
     }
 
     return () => {
       subscription?.remove();
     };
-  }, []);
+  }, [settings.showWeather]);
 
   const fetchLocationWithFallback = async () => {
     const locationServices = [
@@ -265,6 +270,19 @@ export default function WeatherComponent() {
 
   const responsiveStyles = getResponsiveStyles();
 
+  // Show disabled message if weather is turned off in settings
+  if (!settings.showWeather) {
+    return (
+      <View style={styles.errorContainer}>
+        <Ionicons name="settings-outline" size={60} color="#8E8E93" />
+        <Text style={styles.errorText}>Weather Disabled</Text>
+        <Text style={styles.errorSubtext}>
+          Enable weather in Settings to view weather information
+        </Text>
+      </View>
+    );
+  }
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -298,7 +316,21 @@ export default function WeatherComponent() {
   const tempF = celsiusToFahrenheit(currentTemp);
 
   // Fallback to forecast temperature if current observation isn't available
-  const displayTemp = tempF || weather.forecast?.[0]?.temperature;
+  const forecastTemp = weather.forecast?.[0]?.temperature;
+  let displayTemp = tempF || forecastTemp;
+  let tempUnit = 'F';
+
+  // Convert temperature based on user settings
+  if (settings.weatherUnit === 'celsius') {
+    if (tempF) {
+      displayTemp = Math.round(((tempF - 32) * 5) / 9);
+    } else if (forecastTemp) {
+      // Assume forecast is in Fahrenheit from weather.gov
+      displayTemp = Math.round(((forecastTemp - 32) * 5) / 9);
+    }
+    tempUnit = 'C';
+  }
+
   const condition = weather.current?.textDescription || weather.forecast?.[0]?.shortForecast;
 
   // Landscape dock mode - compact layout
@@ -322,7 +354,7 @@ export default function WeatherComponent() {
             />
             <View style={styles.landscapeTemperatureContainer}>
               <Text style={[styles.landscapeTemperature, responsiveStyles.temperature]}>
-                {displayTemp ? `${displayTemp}°` : '--°'}
+                {displayTemp ? `${displayTemp}°${tempUnit}` : '--°'}
               </Text>
               <Text style={[styles.landscapeCondition, responsiveStyles.condition]}>
                 {condition || 'Unknown'}
@@ -379,7 +411,7 @@ export default function WeatherComponent() {
 
           <View style={styles.temperatureContainer}>
             <Text style={[styles.temperature, responsiveStyles.temperature]}>
-              {displayTemp ? `${displayTemp}°` : '--°'}
+              {displayTemp ? `${displayTemp}°${tempUnit}` : '--°'}
             </Text>
             <Text style={[styles.condition, responsiveStyles.condition]}>
               {condition || 'Unknown'}
@@ -435,17 +467,31 @@ export default function WeatherComponent() {
       {weather.forecast && weather.forecast.length > 0 && (
         <View style={styles.forecastCard}>
           <Text style={styles.forecastTitle}>7-Day Forecast</Text>
-          {weather.forecast.slice(0, 7).map((period, index) => (
-            <View key={index} style={styles.forecastItem}>
-              <Text style={styles.forecastDay}>{period.name}</Text>
-              <View style={styles.forecastDetails}>
-                <Ionicons name={getWeatherIcon(period.shortForecast)} size={24} color="#007AFF" />
-                <Text style={styles.forecastTemp}>
-                  {period.temperature}°{period.temperatureUnit}
-                </Text>
+          {weather.forecast.slice(0, 7).map((period, index) => {
+            let forecastTemp = period.temperature;
+            let forecastUnit = period.temperatureUnit;
+
+            // Convert forecast temperature based on user settings
+            if (settings.weatherUnit === 'celsius' && period.temperatureUnit === 'F') {
+              forecastTemp = Math.round(((period.temperature - 32) * 5) / 9);
+              forecastUnit = 'C';
+            } else if (settings.weatherUnit === 'fahrenheit' && period.temperatureUnit === 'C') {
+              forecastTemp = Math.round((period.temperature * 9) / 5 + 32);
+              forecastUnit = 'F';
+            }
+
+            return (
+              <View key={index} style={styles.forecastItem}>
+                <Text style={styles.forecastDay}>{period.name}</Text>
+                <View style={styles.forecastDetails}>
+                  <Ionicons name={getWeatherIcon(period.shortForecast)} size={24} color="#007AFF" />
+                  <Text style={styles.forecastTemp}>
+                    {forecastTemp}°{forecastUnit}
+                  </Text>
+                </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
       )}
     </ScrollView>

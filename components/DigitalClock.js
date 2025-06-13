@@ -1,13 +1,17 @@
 import { activateKeepAwakeAsync, deactivateKeepAwakeAsync } from 'expo-keep-awake';
 import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { useSettings } from '../contexts/SettingsContext';
 
 export default function DigitalClock() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
+  const { settings } = useSettings();
 
   useEffect(() => {
-    activateKeepAwakeAsync(); // Keep screen awake while clock is active
+    if (settings.keepAwake) {
+      activateKeepAwakeAsync(); // Keep screen awake while clock is active
+    }
 
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -19,46 +23,53 @@ export default function DigitalClock() {
 
     return () => {
       clearInterval(timer);
-      deactivateKeepAwakeAsync();
+      if (settings.keepAwake) {
+        deactivateKeepAwakeAsync();
+      }
       subscription?.remove();
     };
-  }, []);
+  }, [settings.keepAwake]);
 
-  const formatTime = (date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour12: false,
+  const formatTime = date => {
+    const options = {
+      hour12: !settings.format24Hour,
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
-    });
+    };
+
+    if (settings.showSeconds) {
+      options.second = '2-digit';
+    }
+
+    return date.toLocaleTimeString('en-US', options);
   };
 
-  const formatTimeNoSeconds = (date) => {
+  const formatTimeNoSeconds = date => {
     return date.toLocaleTimeString('en-US', {
-      hour12: false,
+      hour12: !settings.format24Hour,
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
-  const formatShortDate = (date) => {
+  const formatShortDate = date => {
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
-  const getTimeOfDay = (date) => {
+  const getTimeOfDay = date => {
     const hour = date.getHours();
     if (hour < 6) return 'Night';
     if (hour < 12) return 'Morning';
@@ -74,34 +85,57 @@ export default function DigitalClock() {
     const isLandscape = width > height;
     const scaleFactor = Math.min(width, height) / 400;
 
+    // Font size multipliers based on settings
+    const fontSizeMultiplier =
+      {
+        small: 0.8,
+        medium: 1.0,
+        large: 1.2,
+        xlarge: 1.5,
+      }[settings.fontSize] || 1.0;
+
     return {
       time: {
-        fontSize: Math.max(32, Math.min(72, 72 * scaleFactor)),
+        fontSize: Math.max(32, Math.min(72, 72 * scaleFactor * fontSizeMultiplier)),
         marginBottom: isLandscape ? 10 : 20,
+        color: settings.textColor,
       },
       greeting: {
-        fontSize: Math.max(16, Math.min(20, 20 * scaleFactor)),
+        fontSize: Math.max(16, Math.min(20, 20 * scaleFactor * fontSizeMultiplier)),
         marginBottom: isLandscape ? 10 : 20,
+        color: settings.textColor,
       },
       date: {
-        fontSize: Math.max(14, Math.min(18, 18 * scaleFactor)),
-      }
+        fontSize: Math.max(14, Math.min(18, 18 * scaleFactor * fontSizeMultiplier)),
+        color: settings.textColor,
+      },
     };
   };
 
   const responsiveStyles = getResponsiveStyles();
 
+  // Dynamic container style based on settings
+  const dynamicContainerStyle = {
+    backgroundColor: settings.backgroundColor,
+  };
+
   // Render different layouts for landscape (dock) vs portrait
   if (isLandscape) {
     // Landscape dock mode - optimize for side viewing
     return (
-      <View style={styles.landscapeContainer}>
+      <View style={[styles.landscapeContainer, dynamicContainerStyle]}>
         <View style={styles.landscapeTimeSection}>
-          <Text style={[styles.landscapeTime, responsiveStyles.time]}>{formatTimeNoSeconds(currentTime)}</Text>
-          <Text style={[styles.landscapeDate, responsiveStyles.date]}>{formatShortDate(currentTime)}</Text>
+          <Text style={[styles.landscapeTime, responsiveStyles.time]}>
+            {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
+          </Text>
+          <Text style={[styles.landscapeDate, responsiveStyles.date]}>
+            {formatShortDate(currentTime)}
+          </Text>
         </View>
         <View style={styles.landscapeInfoSection}>
-          <Text style={[styles.landscapeGreeting, responsiveStyles.greeting]}>Good {getTimeOfDay(currentTime)}</Text>
+          <Text style={[styles.landscapeGreeting, responsiveStyles.greeting]}>
+            Good {getTimeOfDay(currentTime)}
+          </Text>
         </View>
       </View>
     );
@@ -109,9 +143,13 @@ export default function DigitalClock() {
 
   // Portrait mode - traditional layout
   return (
-    <View style={styles.container}>
-      <Text style={[styles.greeting, responsiveStyles.greeting]}>Good {getTimeOfDay(currentTime)}</Text>
-      <Text style={[styles.time, responsiveStyles.time]}>{formatTime(currentTime)}</Text>
+    <View style={[styles.container, dynamicContainerStyle]}>
+      <Text style={[styles.greeting, responsiveStyles.greeting]}>
+        Good {getTimeOfDay(currentTime)}
+      </Text>
+      <Text style={[styles.time, responsiveStyles.time]}>
+        {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
+      </Text>
       <Text style={[styles.date, responsiveStyles.date]}>{formatDate(currentTime)}</Text>
     </View>
   );
