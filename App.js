@@ -2,9 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
 
 import { SettingsProvider, useSettings } from './contexts/SettingsContext';
+import { TabBarProvider, useTabBar } from './contexts/TabBarContext';
 import ClockScreen from './screens/ClockScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import TimerScreen from './screens/TimerScreen';
@@ -14,43 +14,8 @@ const Tab = createBottomTabNavigator();
 
 function AppNavigator() {
   const { settings } = useSettings();
-  const [showTabBar, setShowTabBar] = useState(true);
-  const [hideTimer, setHideTimer] = useState(null);
+  const { showTabBar, showTabBarAndResetTimer } = useTabBar();
 
-  // Auto-hide tab bar functionality
-  useEffect(() => {
-    if (settings.autoHideTabBar) {
-      // Start timer to hide tab bar after 3 seconds
-      const timer = setTimeout(() => {
-        setShowTabBar(false);
-      }, 3000);
-      setHideTimer(timer);
-
-      return () => {
-        if (timer) clearTimeout(timer);
-      };
-    } else {
-      // Show tab bar if auto-hide is disabled
-      setShowTabBar(true);
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-        setHideTimer(null);
-      }
-    }
-  }, [settings.autoHideTabBar]);
-
-  // Reset timer on navigation or user interaction
-  const resetHideTimer = () => {
-    if (settings.autoHideTabBar) {
-      setShowTabBar(true);
-      if (hideTimer) clearTimeout(hideTimer);
-
-      const timer = setTimeout(() => {
-        setShowTabBar(false);
-      }, 3000);
-      setHideTimer(timer);
-    }
-  };
   if (settings === undefined) {
     return null; // or a loading spinner
   }
@@ -80,22 +45,23 @@ function AppNavigator() {
             settings.autoHideTabBar && !showTabBar
               ? { display: 'none' }
               : {
-                  backgroundColor: '#111',
-                  borderTopColor: '#333',
+                  backgroundColor: settings.backgroundColor, // Match app background
+                  borderTopColor: settings.backgroundColor === '#000000' ? '#333' : '#666',
                 },
           headerStyle: {
-            backgroundColor: '#000',
+            backgroundColor: settings.backgroundColor, // Match app background
           },
-          headerTintColor: '#fff',
+          headerTintColor: settings.textColor, // Match app text color
           headerTitleStyle: {
             fontWeight: '300',
+            color: settings.textColor,
           },
-          // Conditionally hide header titles based on settings
+          // Completely hide header when titles are off
           headerShown: settings.showScreenTitles,
         })}
         screenListeners={{
-          tabPress: resetHideTimer,
-          focus: resetHideTimer,
+          tabPress: showTabBarAndResetTimer,
+          focus: showTabBarAndResetTimer,
         }}
       >
         <Tab.Screen
@@ -129,7 +95,9 @@ function AppNavigator() {
 export default function App() {
   return (
     <SettingsProvider>
-      <AppNavigator />
+      <TabBarProvider>
+        <AppNavigator />
+      </TabBarProvider>
     </SettingsProvider>
   );
 }
