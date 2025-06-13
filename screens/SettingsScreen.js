@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Switch,
   Dimensions,
+  ScrollView,
   StatusBar,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSettings } from '../contexts/SettingsContext';
 
@@ -52,15 +52,18 @@ const SettingsScreen = () => {
     { name: 'Extra Large', value: 'xlarge' },
   ];
 
-  const updateSetting = useCallback((key, value) => {
-    updateSettings({ [key]: value });
-  }, [updateSettings]);
+  const updateSetting = useCallback(
+    (key, value) => {
+      updateSettings({ [key]: value });
+    },
+    [updateSettings]
+  );
 
   const renderColorPicker = (title, colors, currentValue, onSelect) => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.colorGrid}>
-        {colors.map((color) => (
+        {colors.map(color => (
           <TouchableOpacity
             key={color.value}
             style={[
@@ -70,9 +73,7 @@ const SettingsScreen = () => {
             ]}
             onPress={() => onSelect(color.value)}
           >
-            {currentValue === color.value && (
-              <Text style={styles.checkmark}>✓</Text>
-            )}
+            {currentValue === color.value && <Text style={styles.checkmark}>✓</Text>}
           </TouchableOpacity>
         ))}
       </View>
@@ -83,13 +84,10 @@ const SettingsScreen = () => {
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.optionGrid}>
-        {options.map((option) => (
+        {options.map(option => (
           <TouchableOpacity
             key={option.value}
-            style={[
-              styles.optionButton,
-              currentValue === option.value && styles.selectedOption,
-            ]}
+            style={[styles.optionButton, currentValue === option.value && styles.selectedOption]}
             onPress={() => onSelect(option.value)}
           >
             <Text
@@ -121,8 +119,8 @@ const SettingsScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -130,67 +128,50 @@ const SettingsScreen = () => {
         {/* Appearance Section */}
         <View style={styles.category}>
           <Text style={styles.categoryTitle}>🎨 Appearance</Text>
-          
+
           {renderColorPicker(
             'Background Color',
             backgroundColors,
             settings.backgroundColor,
-            (color) => updateSetting('backgroundColor', color)
+            color => updateSetting('backgroundColor', color)
           )}
 
-          {renderColorPicker(
-            'Text Color',
-            textColors,
-            settings.textColor,
-            (color) => updateSetting('textColor', color)
+          {renderColorPicker('Text Color', textColors, settings.textColor, color =>
+            updateSetting('textColor', color)
           )}
 
-          {renderOptionPicker(
-            'Theme',
-            themes,
-            settings.theme,
-            (theme) => updateSetting('theme', theme)
+          {renderOptionPicker('Theme', themes, settings.theme, theme =>
+            updateSetting('theme', theme)
           )}
 
-          {renderOptionPicker(
-            'Font Size',
-            fontSizes,
-            settings.fontSize,
-            (size) => updateSetting('fontSize', size)
+          {renderOptionPicker('Font Size', fontSizes, settings.fontSize, size =>
+            updateSetting('fontSize', size)
           )}
         </View>
 
         {/* Clock Settings */}
         <View style={styles.category}>
           <Text style={styles.categoryTitle}>🕐 Clock Settings</Text>
-          
-          {renderSwitch(
-            'Show Seconds',
-            settings.showSeconds,
-            (value) => updateSetting('showSeconds', value)
+
+          {renderSwitch('Show Seconds', settings.showSeconds, value =>
+            updateSetting('showSeconds', value)
           )}
 
-          {renderSwitch(
-            '24 Hour Format',
-            settings.format24Hour,
-            (value) => updateSetting('format24Hour', value)
+          {renderSwitch('24 Hour Format', settings.format24Hour, value =>
+            updateSetting('format24Hour', value)
           )}
 
-          {renderSwitch(
-            'Keep Screen Awake',
-            settings.keepAwake,
-            (value) => updateSetting('keepAwake', value)
+          {renderSwitch('Keep Screen Awake', settings.keepAwake, value =>
+            updateSetting('keepAwake', value)
           )}
         </View>
 
         {/* Weather Settings */}
         <View style={styles.category}>
           <Text style={styles.categoryTitle}>🌤️ Weather Settings</Text>
-          
-          {renderSwitch(
-            'Show Weather',
-            settings.showWeather,
-            (value) => updateSetting('showWeather', value)
+
+          {renderSwitch('Show Weather', settings.showWeather, value =>
+            updateSetting('showWeather', value)
           )}
 
           {renderOptionPicker(
@@ -200,14 +181,14 @@ const SettingsScreen = () => {
               { name: 'Celsius', value: 'celsius' },
             ],
             settings.weatherUnit,
-            (unit) => updateSetting('weatherUnit', unit)
+            unit => updateSetting('weatherUnit', unit)
           )}
         </View>
 
         {/* Display Settings */}
         <View style={styles.category}>
           <Text style={styles.categoryTitle}>📱 Display Settings</Text>
-          
+
           {renderOptionPicker(
             'Brightness',
             [
@@ -217,13 +198,12 @@ const SettingsScreen = () => {
               { name: 'High', value: 'high' },
             ],
             settings.brightness,
-            (brightness) => updateSetting('brightness', brightness)
+            brightness => updateSetting('brightness', brightness)
           )}
         </View>
       </ScrollView>
     </View>
   );
-};
 };
 
 const styles = StyleSheet.create({
