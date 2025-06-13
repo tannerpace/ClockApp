@@ -7,15 +7,22 @@ import {
   Switch,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { useSettings } from '../contexts/SettingsContext';
+import { useTabBar } from '../contexts/TabBarContext';
 
 const { width, height } = Dimensions.get('window');
 const isLandscape = width > height;
 
 const SettingsScreen = () => {
   const { settings, updateSettings } = useSettings();
+  const { showTabBarAndResetTimer } = useTabBar();
+
+  const handleTouch = () => {
+    showTabBarAndResetTimer();
+  };
 
   const backgroundColors = [
     { name: 'Black', value: '#000000' },
@@ -117,7 +124,8 @@ const SettingsScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <TouchableWithoutFeedback onPress={handleTouch}>
+      <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
 
       <ScrollView

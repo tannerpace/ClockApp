@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useSettings } from '../contexts/SettingsContext';
+import { useTabBar } from '../contexts/TabBarContext';
 
 export default function TimerScreen() {
   const [time, setTime] = useState(0);
@@ -10,6 +11,11 @@ export default function TimerScreen() {
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
   const intervalRef = useRef(null);
   const { settings } = useSettings();
+  const { showTabBarAndResetTimer } = useTabBar();
+
+  const handleTouch = () => {
+    showTabBarAndResetTimer();
+  };
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({ window }) => {
@@ -102,7 +108,8 @@ export default function TimerScreen() {
   const responsiveStyles = getResponsiveStyles();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: settings.backgroundColor }]}>
+    <TouchableWithoutFeedback onPress={handleTouch}>
+      <SafeAreaView style={[styles.container, { backgroundColor: settings.backgroundColor }]}>
       <View style={[styles.content, { backgroundColor: settings.backgroundColor }]}>
         <View style={styles.modeSelector}>
           <TouchableOpacity
@@ -166,6 +173,7 @@ export default function TimerScreen() {
         </View>
       </View>
     </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
