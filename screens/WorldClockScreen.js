@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { useSettings } from '../contexts/SettingsContext';
 
 export default function WorldClockScreen() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
+  const { settings } = useSettings();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,7 +31,7 @@ export default function WorldClockScreen() {
     { name: 'Dubai', timezone: 'Asia/Dubai' },
   ];
 
-  const getTimeForTimezone = (timezone) => {
+  const getTimeForTimezone = timezone => {
     return currentTime.toLocaleTimeString('en-US', {
       timeZone: timezone,
       hour12: false,
@@ -39,7 +41,7 @@ export default function WorldClockScreen() {
     });
   };
 
-  const getDateForTimezone = (timezone) => {
+  const getDateForTimezone = timezone => {
     return currentTime.toLocaleDateString('en-US', {
       timeZone: timezone,
       weekday: 'short',
@@ -60,23 +62,33 @@ export default function WorldClockScreen() {
       timeZoneItem: {
         width: isLandscape ? '48%' : '100%',
         marginBottom: isLandscape ? 10 : 0,
-      }
+      },
     };
   };
 
   const responsiveStyles = getResponsiveStyles();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.content, responsiveStyles.content]}>
-        <Text style={styles.title}>World Clock</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: settings.backgroundColor }]}>
+      <View
+        style={[
+          styles.content,
+          responsiveStyles.content,
+          { backgroundColor: settings.backgroundColor },
+        ]}
+      >
+        <Text style={[styles.title, { color: settings.textColor }]}>World Clock</Text>
         {timeZones.map((zone, index) => (
           <View key={index} style={[styles.timeZoneItem, responsiveStyles.timeZoneItem]}>
             <View style={styles.cityInfo}>
-              <Text style={styles.cityName}>{zone.name}</Text>
-              <Text style={styles.cityDate}>{getDateForTimezone(zone.timezone)}</Text>
+              <Text style={[styles.cityName, { color: settings.textColor }]}>{zone.name}</Text>
+              <Text style={[styles.cityDate, { color: settings.textColor }]}>
+                {getDateForTimezone(zone.timezone)}
+              </Text>
             </View>
-            <Text style={styles.cityTime}>{getTimeForTimezone(zone.timezone)}</Text>
+            <Text style={[styles.cityTime, { color: settings.textColor }]}>
+              {getTimeForTimezone(zone.timezone)}
+            </Text>
           </View>
         ))}
       </View>

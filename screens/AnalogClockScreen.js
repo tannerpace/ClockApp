@@ -1,10 +1,13 @@
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import AnalogClock from '../components/AnalogClock';
+import { useSettings } from '../contexts/SettingsContext';
 
 export default function AnalogClockScreen() {
+  const { settings } = useSettings();
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView style={[styles.container, { backgroundColor: settings.backgroundColor }]}>
+      <View style={[styles.content, { backgroundColor: settings.backgroundColor }]}>
         <AnalogClock />
       </View>
     </SafeAreaView>

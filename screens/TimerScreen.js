@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSettings } from '../contexts/SettingsContext';
 
 export default function TimerScreen() {
   const [time, setTime] = useState(0);
@@ -8,6 +9,7 @@ export default function TimerScreen() {
   const [timerDuration, setTimerDuration] = useState(300); // 5 minutes default
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
   const intervalRef = useRef(null);
+  const { settings } = useSettings();
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({ window }) => {
@@ -42,7 +44,7 @@ export default function TimerScreen() {
     return () => clearInterval(intervalRef.current);
   }, [isRunning, mode]);
 
-  const formatTime = (seconds) => {
+  const formatTime = seconds => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -68,7 +70,7 @@ export default function TimerScreen() {
     setTime(newMode === 'stopwatch' ? 0 : timerDuration);
   };
 
-  const adjustTimer = (increment) => {
+  const adjustTimer = increment => {
     if (mode === 'timer' && !isRunning) {
       const newDuration = Math.max(60, timerDuration + increment);
       setTimerDuration(newDuration);
@@ -93,21 +95,27 @@ export default function TimerScreen() {
       },
       modeSelector: {
         marginBottom: isLandscape ? 10 : 40,
-      }
+      },
     };
   };
 
   const responsiveStyles = getResponsiveStyles();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView style={[styles.container, { backgroundColor: settings.backgroundColor }]}>
+      <View style={[styles.content, { backgroundColor: settings.backgroundColor }]}>
         <View style={styles.modeSelector}>
           <TouchableOpacity
             style={[styles.modeButton, mode === 'stopwatch' && styles.activeModeButton]}
             onPress={switchMode}
           >
-            <Text style={[styles.modeText, mode === 'stopwatch' && styles.activeModeText]}>
+            <Text
+              style={[
+                styles.modeText,
+                mode === 'stopwatch' && styles.activeModeText,
+                { color: settings.textColor },
+              ]}
+            >
               Stopwatch
             </Text>
           </TouchableOpacity>
@@ -115,37 +123,43 @@ export default function TimerScreen() {
             style={[styles.modeButton, mode === 'timer' && styles.activeModeButton]}
             onPress={switchMode}
           >
-            <Text style={[styles.modeText, mode === 'timer' && styles.activeModeText]}>
+            <Text
+              style={[
+                styles.modeText,
+                mode === 'timer' && styles.activeModeText,
+                { color: settings.textColor },
+              ]}
+            >
               Timer
             </Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.timeDisplay}>{formatTime(time)}</Text>
+        <Text style={[styles.timeDisplay, { color: settings.textColor }]}>{formatTime(time)}</Text>
 
         {mode === 'timer' && !isRunning && (
           <View style={styles.timerControls}>
             <TouchableOpacity style={styles.adjustButton} onPress={() => adjustTimer(-60)}>
-              <Text style={styles.adjustButtonText}>-1m</Text>
+              <Text style={[styles.adjustButtonText, { color: settings.textColor }]}>-1m</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.adjustButton} onPress={() => adjustTimer(60)}>
-              <Text style={styles.adjustButtonText}>+1m</Text>
+              <Text style={[styles.adjustButtonText, { color: settings.textColor }]}>+1m</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.adjustButton} onPress={() => adjustTimer(300)}>
-              <Text style={styles.adjustButtonText}>+5m</Text>
+              <Text style={[styles.adjustButtonText, { color: settings.textColor }]}>+5m</Text>
             </TouchableOpacity>
           </View>
         )}
 
         <View style={styles.controls}>
           <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-            <Text style={styles.buttonText}>Reset</Text>
+            <Text style={[styles.buttonText, { color: settings.textColor }]}>Reset</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.startButton, isRunning && styles.stopButton]}
             onPress={handleStartStop}
           >
-            <Text style={styles.buttonText}>
+            <Text style={[styles.buttonText, { color: settings.textColor }]}>
               {isRunning ? 'Stop' : 'Start'}
             </Text>
           </TouchableOpacity>
