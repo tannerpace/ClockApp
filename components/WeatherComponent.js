@@ -156,8 +156,9 @@ export default function WeatherComponent() {
         const stationsData = await currentResponse.json();
         const forecastData = await forecastResponse.json();
 
-        console.log('Forecast data structure:', forecastData);
+        console.log('Forecast data:', forecastData);
         console.log('Forecast periods:', forecastData.periods);
+        console.log('Number of forecast periods:', forecastData.periods?.length);
 
         if (stationsData.features && stationsData.features.length > 0) {
           const stationUrl = stationsData.features[0].id;
@@ -167,15 +168,15 @@ export default function WeatherComponent() {
             const observationData = await observationResponse.json();
 
             setWeather({
-              current: observationData.properties,
-              forecast: forecastData.periods || [],
+              current: observationData?.properties || null,
+              forecast: forecastData?.periods || [],
               location: pointsData,
             });
           } else {
             // If observation fails, at least show forecast
             setWeather({
               current: null,
-              forecast: forecastData.periods || [],
+              forecast: forecastData?.periods || [],
               location: pointsData,
             });
           }
@@ -183,7 +184,7 @@ export default function WeatherComponent() {
           // If no stations, at least show forecast
           setWeather({
             current: null,
-            forecast: forecastData.periods || [],
+            forecast: forecastData?.periods || [],
             location: pointsData,
           });
         }
@@ -262,25 +263,6 @@ export default function WeatherComponent() {
     };
   };
 
-  const getLocationDisplay = () => {
-    // First try to use the IP-based location data (more accurate city/region)
-    if (location?.city && location?.region) {
-      return `${location.city}, ${location.region}`;
-    }
-
-    // Fallback to weather.gov location data
-    if (weather?.location?.relativeLocation) {
-      const city = weather.location.relativeLocation.city;
-      const state = weather.location.relativeLocation.state;
-      if (city && state) {
-        return `${city}, ${state}`;
-      }
-    }
-
-    // Final fallback
-    return 'Location Unknown';
-  };
-
   const responsiveStyles = getResponsiveStyles();
 
   if (loading) {
@@ -314,7 +296,7 @@ export default function WeatherComponent() {
 
   const currentTemp = weather.current?.temperature?.value;
   const tempF = celsiusToFahrenheit(currentTemp);
-  
+
   // Fallback to forecast temperature if current observation isn't available
   const displayTemp = tempF || weather.forecast?.[0]?.temperature;
   const condition = weather.current?.textDescription || weather.forecast?.[0]?.shortForecast;
@@ -327,7 +309,7 @@ export default function WeatherComponent() {
           <View style={styles.landscapeLocationHeader}>
             <Ionicons name="location-outline" size={12} color="#8E8E93" />
             <Text style={[styles.landscapeLocationText, responsiveStyles.location]}>
-              {getLocationDisplay()}
+              {location?.city}, {location?.region}
             </Text>
           </View>
 
@@ -383,7 +365,7 @@ export default function WeatherComponent() {
         <View style={styles.locationHeader}>
           <Ionicons name="location-outline" size={16} color="#8E8E93" />
           <Text style={[styles.locationText, responsiveStyles.location]}>
-            {getLocationDisplay()}
+            {location?.city}, {location?.region}
           </Text>
         </View>
 
@@ -397,7 +379,7 @@ export default function WeatherComponent() {
 
           <View style={styles.temperatureContainer}>
             <Text style={[styles.temperature, responsiveStyles.temperature]}>
-              {tempF ? `${tempF}°` : '--°'}
+              {displayTemp ? `${displayTemp}°` : '--°'}
             </Text>
             <Text style={[styles.condition, responsiveStyles.condition]}>
               {condition || 'Unknown'}
