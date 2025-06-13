@@ -1,13 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import { ActivityIndicator, Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function WeatherComponent() {
   const [weather, setWeather] = useState(null);
@@ -15,46 +8,118 @@ export default function WeatherComponent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [screenDimensions, setScreenDimensions] = useState(Dimensions.get('window'));
+  const [lastFetch, setLastFetch] = useState(null);
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({ window }) => {
       setScreenDimensions(window);
     });
 
-    fetchWeatherData();
+    // Only fetch if we haven't fetched in the last 10 minutes
+    const now = Date.now();
+    if (!lastFetch || now - lastFetch > 10 * 60 * 1000) {
+      fetchWeatherData();
+    }
 
     return () => {
       subscription?.remove();
     };
   }, []);
 
+  const fetchLocationWithFallback = async () => {
+    const locationServices = [
+      {
+        name: 'ipapi.co',
+        url: 'https://ipapi.co/json/',
+        parser: data => ({
+          latitude: data.latitude,
+          longitude: data.longitude,
+          city: data.city,
+          region: data.region,
+          country: data.country,
+        }),
+      },
+      {
+        name: 'ip-api.com',
+        url: 'http://ip-api.com/json/',
+        parser: data => ({
+          latitude: data.lat,
+          longitude: data.lon,
+          city: data.city,
+          region: data.regionName,
+          country: data.country,
+        }),
+      },
+      {
+        name: 'ipgeolocation.io',
+        url: 'https://api.ipgeolocation.io/ipgeo?apiKey=',
+        parser: data => ({
+          latitude: parseFloat(data.latitude),
+          longitude: parseFloat(data.longitude),
+          city: data.city,
+          region: data.state_prov,
+          country: data.country_name,
+        }),
+      },
+    ];
+
+    for (const service of locationServices) {
+      try {
+        console.log(`Trying ${service.name}...`);
+
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+        const response = await fetch(service.url, {
+          signal: controller.signal,
+          headers: { Accept: 'application/json' },
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          console.warn(`${service.name} failed: ${response.status}`);
+          continue;
+        }
+
+        const data = await response.json();
+        const locationData = service.parser(data);
+
+        if (locationData.latitude && locationData.longitude) {
+          console.log(`Location from ${service.name}:`, locationData);
+          return locationData;
+        }
+      } catch (error) {
+        console.warn(`${service.name} error:`, error.message);
+        continue;
+      }
+    }
+
+    // If all services fail, use a default location (New York City)
+    console.warn('All location services failed, using default location');
+    return {
+      latitude: 40.7128,
+      longitude: -74.006,
+      city: 'New York',
+      region: 'NY',
+      country: 'United States',
+    };
+  };
+
   const fetchWeatherData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Get location from IP with better error handling
-      console.log('Fetching location from IP...');
-      const locationResponse = await fetch('https://ipapi.co/json/');
-
-      if (!locationResponse.ok) {
-        console.error('Location response not ok:', locationResponse.status, locationResponse.statusText);
-        throw new Error(`Failed to get location: ${locationResponse.status} ${locationResponse.statusText}`);
-      }
-
-      const locationData = await locationResponse.json();
-      console.log('Location data:', locationData);
-
-      if (!locationData.latitude || !locationData.longitude) {
-        throw new Error('Location data missing coordinates');
-      }
-
+      // Get location with fallback services
+      const locationData = await fetchLocationWithFallback();
       setLocation(locationData);
 
       // Get weather data from National Weather Service
       const headers = {
-        "User-Agent": "ClockApp (newtanner29@gmail.com)",
-        Accept: "application/ld+json",
+        'User-Agent': 'ClockApp (newtanner29@gmail.com)',
+        Accept: 'application/ld+json',
       };
 
       console.log(`Fetching weather for: ${locationData.latitude}, ${locationData.longitude}`);
@@ -64,16 +129,27 @@ export default function WeatherComponent() {
       );
 
       if (!pointsResponse.ok) {
-        throw new Error(`Failed to get grid data: ${pointsResponse.status} ${pointsResponse.statusText}`);
+        throw new Error(
+          `Failed to get grid data: ${pointsResponse.status} ${pointsResponse.statusText}`
+        );
       }
 
       const pointsData = await pointsResponse.json();
       console.log('Points data:', pointsData);
 
+      // Check if we have the required URLs (they're directly in the response object)
+      if (!pointsData.observationStations || !pointsData.forecast) {
+        console.error('Missing required URLs in points data:', pointsData);
+        throw new Error('Invalid points data structure - missing required URLs');
+      }
+
+      console.log('Observation stations URL:', pointsData.observationStations);
+      console.log('Forecast URL:', pointsData.forecast);
+
       // Get current weather and forecast
       const [currentResponse, forecastResponse] = await Promise.all([
-        fetch(pointsData.properties.observationStations, { headers }),
-        fetch(pointsData.properties.forecast, { headers })
+        fetch(pointsData.observationStations, { headers }),
+        fetch(pointsData.forecast, { headers }),
       ]);
 
       if (currentResponse.ok && forecastResponse.ok) {
@@ -90,14 +166,14 @@ export default function WeatherComponent() {
             setWeather({
               current: observationData.properties,
               forecast: forecastData.properties.periods,
-              location: pointsData.properties
+              location: pointsData,
             });
           } else {
             // If observation fails, at least show forecast
             setWeather({
               current: null,
               forecast: forecastData.properties.periods,
-              location: pointsData.properties
+              location: pointsData,
             });
           }
         } else {
@@ -105,7 +181,7 @@ export default function WeatherComponent() {
           setWeather({
             current: null,
             forecast: forecastData.properties.periods,
-            location: pointsData.properties
+            location: pointsData,
           });
         }
       } else {
@@ -113,7 +189,11 @@ export default function WeatherComponent() {
         setWeather({
           current: null,
           forecast: null,
-          location: { relativeLocation: { properties: { city: locationData.city, state: locationData.region } } }
+          location: {
+            relativeLocation: {
+              properties: { city: locationData.city, state: locationData.region },
+            },
+          },
         });
       }
     } catch (err) {
@@ -125,20 +205,23 @@ export default function WeatherComponent() {
         setWeather({
           current: null,
           forecast: null,
-          location: { relativeLocation: { properties: { city: location.city, state: location.region } } }
+          location: {
+            relativeLocation: { properties: { city: location.city, state: location.region } },
+          },
         });
       }
     } finally {
       setLoading(false);
+      setLastFetch(Date.now()); // Update last fetch timestamp
     }
   };
 
-  const celsiusToFahrenheit = (celsius) => {
+  const celsiusToFahrenheit = celsius => {
     if (celsius === null || celsius === undefined) return null;
-    return Math.round((celsius * 9 / 5) + 32);
+    return Math.round((celsius * 9) / 5 + 32);
   };
 
-  const getWeatherIcon = (condition) => {
+  const getWeatherIcon = condition => {
     if (!condition) return 'cloud-outline';
 
     const conditionLower = condition.toLowerCase();
@@ -266,7 +349,10 @@ export default function WeatherComponent() {
 
   // Portrait mode - full layout
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: responsiveStyles.containerPadding }}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ padding: responsiveStyles.containerPadding }}
+    >
       {/* Main Weather Card */}
       <View style={styles.mainCard}>
         <View style={styles.locationHeader}>
@@ -344,15 +430,9 @@ export default function WeatherComponent() {
           <Text style={styles.forecastTitle}>7-Day Forecast</Text>
           {weather.forecast.slice(0, 7).map((period, index) => (
             <View key={index} style={styles.forecastItem}>
-              <Text style={styles.forecastDay}>
-                {period.name}
-              </Text>
+              <Text style={styles.forecastDay}>{period.name}</Text>
               <View style={styles.forecastDetails}>
-                <Ionicons
-                  name={getWeatherIcon(period.shortForecast)}
-                  size={24}
-                  color="#007AFF"
-                />
+                <Ionicons name={getWeatherIcon(period.shortForecast)} size={24} color="#007AFF" />
                 <Text style={styles.forecastTemp}>
                   {period.temperature}°{period.temperatureUnit}
                 </Text>
@@ -467,6 +547,67 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 4,
     textAlign: 'center',
+  },
+  // Landscape dock mode styles
+  landscapeContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  landscapeMainSection: {
+    flex: 2,
+    alignItems: 'flex-start',
+  },
+  landscapeLocationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  landscapeLocationText: {
+    color: '#8E8E93',
+    fontSize: 14,
+    fontWeight: '400',
+    marginLeft: 4,
+  },
+  landscapeWeatherRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  landscapeWeatherIcon: {
+    marginRight: 16,
+  },
+  landscapeTemperatureContainer: {
+    alignItems: 'flex-start',
+  },
+  landscapeTemperature: {
+    color: '#FFFFFF',
+    fontSize: 48,
+    fontWeight: '200',
+    lineHeight: 52,
+  },
+  landscapeCondition: {
+    color: '#8E8E93',
+    fontSize: 14,
+    fontWeight: '400',
+    marginTop: 2,
+  },
+  landscapeDetailsSection: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  landscapeDetailItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  landscapeDetailValue: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: 6,
   },
   forecastCard: {
     backgroundColor: '#1C1C1E',

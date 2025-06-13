@@ -123,6 +123,36 @@
         "focus": true,
         "panel": "shared"
       }
+    },
+    {
+      "label": "Restart with Clean Cache",
+      "type": "shell",
+      "command": "npx expo start --clear --reset-cache",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Test Landscape Mode (Android)",
+      "type": "shell",
+      "command": "adb shell settings put system accelerometer_rotation 1 && adb shell input keyevent 82",
+      "group": "test",
+      "isBackground": false,
+      "problemMatcher": [],
+      "args": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
     }
   ]
 }
