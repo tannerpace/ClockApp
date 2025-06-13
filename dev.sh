@@ -56,6 +56,30 @@ case "$1" in
         adb shell settings put system accelerometer_rotation 0
         echo "✅ Rotation locked!"
         ;;
+    "pixel9-setup")
+        echo "📱 Optimizing for Pixel 9..."
+        echo "Setting up auto-rotation..."
+        adb shell settings put system accelerometer_rotation 1
+        echo "Enabling always-on display..."
+        adb shell settings put secure doze_always_on 1
+        echo "Setting optimal brightness for clock viewing..."
+        adb shell settings put system screen_brightness 128
+        echo "Setting landscape for dock mode..."
+        adb shell settings put system user_rotation 1
+        echo "✅ Pixel 9 optimization complete! Perfect for dock usage."
+        ;;
+    "pixel9-test")
+        echo "🧪 Testing Pixel 9 dock modes..."
+        echo "Testing landscape dock mode..."
+        adb shell settings put system user_rotation 1
+        sleep 2
+        echo "Testing portrait mode..."
+        adb shell settings put system user_rotation 0
+        sleep 2
+        echo "Back to landscape dock mode..."
+        adb shell settings put system user_rotation 1
+        echo "✅ Pixel 9 dock test complete!"
+        ;;
     "install")
         echo "📦 Installing dependencies..."
         npm install
@@ -90,6 +114,10 @@ case "$1" in
         echo "  rotate-right - Rotate 90° right"
         echo "  auto-rotate  - Enable auto-rotation"
         echo "  lock-rotation - Lock current rotation"
+        echo ""
+        echo "📱 Pixel 9 Optimization:"
+        echo "  pixel9-setup - Optimize all settings for Pixel 9 dock usage"
+        echo "  pixel9-test  - Test dock mode rotations on Pixel 9"
         echo ""
         echo "🛠️ Utility Commands:"
         echo "  status    - Check if Expo is running"
