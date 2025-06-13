@@ -26,6 +26,21 @@ export const SettingsProvider = ({ children }) => {
     clockType: 'digital',
     showScreenTitles: true,
     autoHideTabBar: false,
+    // Digital clock styling options
+    clockShadow: true,
+    clockShadowColor: '#000000',
+    clockShadowIntensity: 'medium',
+    clockGlow: false,
+    clockGlowColor: '#FFFFFF',
+    clockGlowIntensity: 'medium',
+    clockGradient: false,
+    clockGradientColors: ['#FFFFFF', '#CCCCCC'],
+    clockBorder: false,
+    clockBorderColor: '#FFFFFF',
+    clockBorderWidth: 'thin',
+    clockBackgroundBlur: false,
+    clockFontWeight: 'normal',
+    clockLetterSpacing: 'normal',
   });
 
   const [isLoading, setIsLoading] = useState(true);

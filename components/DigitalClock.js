@@ -100,6 +100,88 @@ export default function DigitalClock() {
       baseFontSize = Math.min(60, (availableWidth / charCount) * 1.2);
     }
 
+    // Generate dynamic styles based on new styling options
+    const getFontWeight = () => {
+      const weights = {
+        ultralight: '100',
+        light: '200',
+        normal: '300',
+        medium: '500',
+        bold: '700',
+        extrabold: '800',
+      };
+      return weights[settings.clockFontWeight] || '300';
+    };
+
+    const getLetterSpacing = () => {
+      const spacings = {
+        tight: -1,
+        normal: 0,
+        wide: 2,
+        extrawide: 4,
+      };
+      return spacings[settings.clockLetterSpacing] || 0;
+    };
+
+    const getShadowStyle = () => {
+      let shadowStyle = {};
+      
+      // Regular shadow
+      if (settings.clockShadow) {
+        const intensities = {
+          light: { shadowRadius: 4, shadowOpacity: 0.3 },
+          medium: { shadowRadius: 8, shadowOpacity: 0.5 },
+          strong: { shadowRadius: 12, shadowOpacity: 0.7 },
+        };
+        
+        shadowStyle = {
+          textShadowColor: settings.clockShadowColor,
+          textShadowOffset: { width: 2, height: 2 },
+          textShadowRadius: intensities[settings.clockShadowIntensity]?.shadowRadius || 8,
+        };
+      }
+      
+      // Glow effect (simulated with multiple shadows)
+      if (settings.clockGlow) {
+        const glowIntensities = {
+          light: 6,
+          medium: 12,
+          strong: 20,
+        };
+        
+        const glowRadius = glowIntensities[settings.clockGlowIntensity] || 12;
+        
+        // Override or combine with shadow
+        shadowStyle = {
+          textShadowColor: settings.clockGlowColor,
+          textShadowOffset: { width: 0, height: 0 },
+          textShadowRadius: glowRadius,
+          // Add elevation for Android glow effect
+          elevation: settings.clockGlow ? 8 : 0,
+        };
+      }
+      
+      return shadowStyle;
+    };
+
+    const getBorderStyle = () => {
+      if (!settings.clockBorder) return {};
+      
+      const widths = {
+        thin: 1,
+        medium: 2,
+        thick: 3,
+      };
+      
+      return {
+        borderWidth: widths[settings.clockBorderWidth] || 1,
+        borderColor: settings.clockBorderColor,
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+      };
+    };
+
     return {
       time: {
         fontSize: Math.max(24, baseFontSize * fontSizeMultiplier),
@@ -108,6 +190,14 @@ export default function DigitalClock() {
         // Ensure text doesn't wrap
         flexShrink: 1,
         textAlign: 'center',
+        // Apply new styling options
+        fontWeight: getFontWeight(),
+        letterSpacing: getLetterSpacing(),
+        ...getShadowStyle(),
+      },
+      timeContainer: {
+        ...getBorderStyle(),
+      },
       },
       greeting: {
         fontSize: Math.max(14, Math.min(20, baseFontSize * 0.3 * fontSizeMultiplier)),
@@ -134,14 +224,16 @@ export default function DigitalClock() {
     return (
       <View style={[styles.landscapeContainer, dynamicContainerStyle]}>
         <View style={styles.landscapeTimeSection}>
-          <Text
-            style={[styles.landscapeTime, responsiveStyles.time]}
-            numberOfLines={1}
-            adjustsFontSizeToFit={true}
-            minimumFontScale={0.6}
-          >
-            {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
-          </Text>
+          <View style={responsiveStyles.timeContainer}>
+            <Text
+              style={[styles.landscapeTime, responsiveStyles.time]}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.6}
+            >
+              {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
+            </Text>
+          </View>
           <Text style={[styles.landscapeDate, responsiveStyles.date]}>
             {formatShortDate(currentTime)}
           </Text>
@@ -161,14 +253,16 @@ export default function DigitalClock() {
       <Text style={[styles.greeting, responsiveStyles.greeting]}>
         Good {getTimeOfDay(currentTime)}
       </Text>
-      <Text
-        style={[styles.time, responsiveStyles.time]}
-        numberOfLines={1}
-        adjustsFontSizeToFit={true}
-        minimumFontScale={0.5}
-      >
-        {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
-      </Text>
+      <View style={responsiveStyles.timeContainer}>
+        <Text
+          style={[styles.time, responsiveStyles.time]}
+          numberOfLines={1}
+          adjustsFontSizeToFit={true}
+          minimumFontScale={0.5}
+        >
+          {settings.showSeconds ? formatTime(currentTime) : formatTimeNoSeconds(currentTime)}
+        </Text>
+      </View>
       <Text style={[styles.date, responsiveStyles.date]}>{formatDate(currentTime)}</Text>
     </View>
   );
